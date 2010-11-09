@@ -89,7 +89,7 @@ div.track {
     margin-bottom: -3px;
 }
 
-div#static_track {
+div.static_track {
     top: 0px;
     position: absolute;
     background-color: #f0f0f0;

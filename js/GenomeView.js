@@ -152,7 +152,7 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
     // the scrollContainer is the element that changes position
     // when the user scrolls
     this.scrollContainer = document.createElement("div");
-    this.scrollContainer.id = "container";
+    this.scrollContainer.id = "container-" + elem.id;
     this.scrollContainer.style.cssText =
         "position: absolute; left: 0px; top: 0px;";
     elem.appendChild(this.scrollContainer);
@@ -161,7 +161,7 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
     // they used to be the same element, but making zoomContainer separate
     // enables it to be narrower than this.elem.
     this.zoomContainer = document.createElement("div");
-    this.zoomContainer.id = "zoomContainer";
+    this.zoomContainer.id = "zoomContainer-" + elem.id;
     this.zoomContainer.style.cssText =
         "position: absolute; left: 0px; top: 0px; height: 100%;";
     this.scrollContainer.appendChild(this.zoomContainer);
@@ -173,9 +173,6 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
     //The number of characters per stripe is somewhat arbitrarily set
     //at stripeWidth / 10
     this.fullZoomStripe = this.charWidth * (stripeWidth / 10);
-
-    this.overview = dojo.byId("overview");
-    this.overviewBox = dojo.marginBox(this.overview);
 
     this.tracks = [];
     this.uiTracks = [];
@@ -205,16 +202,8 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
     this.trackHeights = [];
     this.trackTops = [];
     this.trackLabels = [];
-    this.waitElems = [dojo.byId("moveLeft"), dojo.byId("moveRight"),
-                      dojo.byId("zoomIn"), dojo.byId("zoomOut"),
-                      dojo.byId("bigZoomIn"), dojo.byId("bigZoomOut"),
-                      document.body, elem];
+    this.waitElems = [document.body, elem];
     this.prevCursors = [];
-    this.locationThumb = document.createElement("div");
-    this.locationThumb.className = "locationThumb";
-    this.overview.appendChild(this.locationThumb);
-    this.locationThumbMover = new dojo.dnd.move.parentConstrainedMoveable(this.locationThumb, {area: "margin", within: true});
-    dojo.connect(this.locationThumbMover, "onMoveStop", this, "thumbMoved");
 
     var view = this;
 
@@ -444,9 +433,9 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
                  view.wheelScroll, false);
 
     var trackDiv = document.createElement("div");
-    trackDiv.className = "track";
+    trackDiv.className = "track static_track";
     trackDiv.style.height = this.posHeight + "px";
-    trackDiv.id = "static_track";
+    trackDiv.id = "static_track" + elem.id;
     this.staticTrack = new StaticTrack("static_track", "pos-label", this.posHeight);
     this.staticTrack.setViewInfo(function(height) {}, this.stripeCount,
                                  trackDiv, undefined, this.stripePercent,
@@ -457,7 +446,7 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
     var gridTrackDiv = document.createElement("div");
     gridTrackDiv.className = "track";
     gridTrackDiv.style.cssText = "top: 0px; height: 100%;";
-    gridTrackDiv.id = "gridtrack";
+    gridTrackDiv.id = "gridtrack" + elem.id;
     var gridTrack = new GridTrack("gridtrack");
     gridTrack.setViewInfo(function(height) {}, this.stripeCount,
                           gridTrackDiv, undefined, this.stripePercent,
@@ -474,8 +463,6 @@ function GenomeView(elem, stripeWidth, refseq, zoomLevel) {
     }, this);
 
     this.zoomContainer.style.paddingTop = this.topSpace + "px";
-
-    this.addOverviewTrack(new StaticTrack("overview_loc_track", "overview-pos", this.overviewPosHeight));
 
     document.body.style.cursor = "url(\"closedhand.cur\")";
     document.body.style.cursor = "default";
@@ -516,9 +503,7 @@ GenomeView.prototype.setLocation = function(refseq, startbp, endbp) {
 	};
 	dojo.forEach(this.tracks, removeTrack);
         dojo.forEach(this.uiTracks, function(track) { track.clear(); });
-	this.overviewTrackIterate(removeTrack);
 
-	this.addOverviewTrack(new StaticTrack("overview_loc_track", "overview-pos", this.overviewPosHeight));
         this.sizeInit();
         this.setY(0);
         this.containerHeight = this.topSpace;
@@ -621,7 +606,7 @@ GenomeView.prototype.thumbMoved = function(mover) {
     var pxLeft = parseInt(this.locationThumb.style.left);
     var pxWidth = parseInt(this.locationThumb.style.width);
     var pxCenter = pxLeft + (pxWidth / 2);
-    this.centerAtBase(((pxCenter / this.overviewBox.w) * (this.ref.end - this.ref.start)) + this.ref.start);
+    //this.centerAtBase(((pxCenter / this.overviewBox.w) * (this.ref.end - this.ref.start)) + this.ref.start);
 };
 
 GenomeView.prototype.checkY = function(y) {
@@ -666,7 +651,7 @@ GenomeView.prototype.bpToPx = function(bp) {
 GenomeView.prototype.sizeInit = function() {
     this.dim = {width: this.elem.clientWidth,
                 height: this.elem.clientHeight};
-    this.overviewBox = dojo.marginBox(this.overview);
+    //this.overviewBox = dojo.marginBox(this.overview);
 
     //scale values, in pixels per bp, for all zoom levels
     this.zoomLevels = [1/500000, 1/200000, 1/100000, 1/50000, 1/20000, 1/10000, 1/5000, 1/2000, 1/1000, 1/500, 1/200, 1/100, 1/50, 1/20, 1/10, 1/5, 1/2, 1, 2, 5, this.charWidth];
@@ -756,37 +741,13 @@ GenomeView.prototype.sizeInit = function() {
     posSize.className = "overview-pos";
     posSize.appendChild(document.createTextNode(Util.addCommas(this.ref.end)));
     posSize.style.visibility = "hidden";
-    this.overview.appendChild(posSize);
+    this.elem.appendChild(posSize);
     // we want the stripes to be at least as wide as the position labels,
     // plus an arbitrary 20% padding so it's clear which grid line
     // a position label corresponds to.
     var minStripe = posSize.clientWidth * 1.2;
     this.overviewPosHeight = posSize.clientHeight;
-    this.overview.removeChild(posSize);
-    for (var n = 1; n < 30; n++) {
-	//http://research.att.com/~njas/sequences/A051109
-        // JBrowse uses this sequence (1, 2, 5, 10, 20, 50, 100, 200, 500...)
-        // as its set of zoom levels.  That gives nice round numbers for
-        // bases per block, and it gives zoom transitions that feel about the
-        // right size to me. -MS
-	this.overviewStripeBases = (Math.pow(n % 3, 2) + 1) * Math.pow(10, Math.floor(n/3));
-	this.overviewStripes = Math.ceil(refLength / this.overviewStripeBases);
-	if ((this.overviewBox.w / this.overviewStripes) > minStripe) break;
-	if (this.overviewStripes < 2) break;
-    }
-
-    var overviewStripePct = 100 / (refLength / this.overviewStripeBases);
-    var overviewHeight = 0;
-    this.overviewTrackIterate(function (track, view) {
-	    track.clear();
-	    track.sizeInit(view.overviewStripes,
-			   overviewStripePct);
-            track.showRange(0, view.overviewStripes - 1,
-                            0, view.overviewStripeBases,
-                            view.overviewBox.w /
-                            (view.ref.end - view.ref.start));
-	});
-    this.updateOverviewHeight();
+    this.elem.removeChild(posSize);
 };
 
 GenomeView.prototype.overviewTrackIterate = function(callback) {
@@ -1036,11 +997,11 @@ GenomeView.prototype.addTrack = function(track) {
     var trackNum = this.tracks.length;
     var labelDiv = document.createElement("div");
     labelDiv.className = "track-label dojoDndHandle";
-    labelDiv.id = "label_" + track.name;
+    labelDiv.id = "label_" + track.name + "-" + this.elem.id;
     this.trackLabels.push(labelDiv);
     var trackDiv = document.createElement("div");
     trackDiv.className = "track";
-    trackDiv.id = "track_" + track.name;
+    trackDiv.id = "track_" + track.name + "-" + this.elem.id;
     trackDiv.track = track;
     var view = this;
     var heightUpdate = function(height) {
