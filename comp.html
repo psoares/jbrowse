@@ -38,35 +38,63 @@
         function() {
 
            var refSeq = refSeqs[21];
-           var gv1 = new GenomeView(dojo.byId("species1"), 250, refSeq, 1/200);
-           var gv2 = new GenomeView(dojo.byId("species2"), 250, refSeq, 1/200);
+           var gv1 = new GenomeView(dojo.byId("species1"), 250, refSeq, 1/1000);
+           var gv2 = new GenomeView(dojo.byId("species2"), 250, refSeq, 1/1000);
 
            var track = trackInfo[2];
-           var replaceData = {refseq: refSeq.name};
-           var url = track.url.replace(/\{([^}]+)\}/g, function(match, group) {return replaceData[group];});
-           var klass = eval(track.type);
 
-           var newTrack = new klass(track, url, refSeq,
-                                    {
-                                        changeCallback: function() {gv1.showVisibleBlocks()},
-                                        trackPadding: gv1.trackPadding,
-                                        baseUrl: "",
-                                        charWidth: gv1.charWidth,
-                                        seqHeight: gv1.seqHeight
-                                    });
+           var trackCreate1 = function(track, hint) {
+               var node;
+                   var replaceData = {refseq: refSeq.name};
+                   var url = track.url.replace(/\{([^}]+)\}/g, function(match, group) {return replaceData[group];});
+                   var klass = eval(track.type);
+                   var newTrack = new klass(track, url, refSeq,
+                                            {
+                                                changeCallback: function() {gv1.showVisibleBlocks()},
+                                                trackPadding: gv1.trackPadding,
+                                                baseUrl: "",
+                                                charWidth: gv1.charWidth,
+                                                seqHeight: gv1.seqHeight
+                                            });
+                   node = gv1.addTrack(newTrack);
 
-           gv1.addTrack(newTrack);
+               return {node: node, data: track, type: ["track"]};
+           };
 
-           var newTrack2 = new klass(track, url, refSeq,
-                                     {
-                                         changeCallback: function() {gv2.showVisibleBlocks()},
-                                         trackPadding: gv2.trackPadding,
-                                         baseUrl: "",
-                                         charWidth: gv2.charWidth,
-                                         seqHeight: gv2.seqHeight
-                                     });
+           var viewDndWidget1 = new dojo.dnd.Source(gv1.zoomContainer,
+                                                    {
+                                                        creator: trackCreate1,
+                                                        accept: ["track"],
+                                                        withHandles: true
+                                                    });
 
-           gv2.addTrack(newTrack);
+           var trackCreate2 = function(track, hint) {
+               var node;
+                   var replaceData = {refseq: refSeq.name};
+                   var url = track.url.replace(/\{([^}]+)\}/g, function(match, group) {return replaceData[group];});
+                   var klass = eval(track.type);
+                   var newTrack = new klass(track, url, refSeq,
+                                            {
+                                                changeCallback: function() {gv2.showVisibleBlocks()},
+                                                trackPadding: gv2.trackPadding,
+                                                baseUrl: "",
+                                                charWidth: gv2.charWidth,
+                                                seqHeight: gv2.seqHeight
+                                            });
+                   node = gv2.addTrack(newTrack);
+               return {node: node, data: track, type: ["track"]};
+           };
+
+           var viewDndWidget2 = new dojo.dnd.Source(gv2.zoomContainer,
+                                                    {
+                                                        creator: trackCreate2,
+                                                        accept: ["track"],
+                                                        withHandles: true
+                                                    });
+
+           viewDndWidget1.insertNodes(false, [track]);
+           viewDndWidget2.insertNodes(false, [track]);
+
         })
     /* ]]> */
     </script>
