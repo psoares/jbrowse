@@ -18,7 +18,6 @@ SeqFeatureStore.NCList = function(args) {
 
     this.baseUrl = args.baseUrl;
     this.urlTemplates = { tracklist: args.urlTemplate };
-    this.refSeq = args.refSeq;
 };
 
 SeqFeatureStore.NCList.prototype = new SeqFeatureStore();
@@ -27,20 +26,26 @@ SeqFeatureStore.NCList.prototype.makeNCList = function() {
     return new NCList();
 };
 
-SeqFeatureStore.NCList.prototype.load = function() {
-    var that = this,
-         url = Util.resolveUrl(
-                   this.baseUrl,
-                   Util.fillTemplate( this.urlTemplates.tracklist,
-                                      {'refseq': this.refSeq.name}
-                                    )
-               );
-    // fetch the trackdata
-    dojo.xhrGet({ url: url,
-                  handleAs: "json",
-                  load:  Util.debugHandler(this,function(o) { that.loadSuccess(o, url); }),
-                  error: function(e) { console.error(''+e); that.loadFail(e, url);    }
-	        });
+SeqFeatureStore.NCList.prototype.forRefSeq = function( refSeqName, callback ) {
+    if( !(refSeqName in this.nclists )) {
+        var that = this,
+        data_root_url = Util.resolveUrl(
+            this.baseUrl,
+            Util.fillTemplate( this.urlTemplates.tracklist,
+                               {'refseq': refSeqName }
+                             )
+        );
+
+        this.nclists[refSeqName] = 'loading';
+        // fetch the trackdata
+        dojo.xhrGet({ url: url,
+                      handleAs: "json",
+                      load:  Util.debugHandler( this, function(o) { that.loadSuccess(o, url); }),
+                      error: function(e) { console.error(''+e); that.loadFail(e, url);    }
+	            });
+    } else {
+
+    }
 };
 
 SeqFeatureStore.NCList.prototype.loadSuccess = function( trackInfo, url ) {
@@ -72,12 +77,10 @@ SeqFeatureStore.NCList.prototype.loadNCList = function( trackInfo, url ) {
 
 
 SeqFeatureStore.NCList.prototype.loadFail = function(trackInfo,url) {
-    this.empty = true;
-    this.setLoaded();
 };
 
 // just forward histogram() and iterate() to our encapsulate nclist
-SeqFeatureStore.NCList.prototype.histogram = function() {
+SeqFeatureStore.NCList.prototype.iterateHistogram = function() {
     return this.nclist.histogram.apply( this.nclist, arguments );
 };
 
@@ -94,8 +97,10 @@ SeqFeatureStore.NCList.prototype.iterate = function( startBase, endBase, origFea
     return this.nclist.iterate.call( this.nclist, startBase, endBase, featCallBack, finishCallback );
 };
 
-// helper method to recursively add a .get method to a feature and its
-// subfeatures
+/**
+ * Helper method to recursively add a .get method to a feature and its subfeatures.
+ * @private
+ */
 SeqFeatureStore.NCList.prototype._add_getters = function(getter,feature) {
     var that = this;
     feature.get = getter;

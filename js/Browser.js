@@ -44,13 +44,27 @@ var Browser = function(params) {
     var browser = this;
     dojo.addOnLoad( function() { browser.loadConfig(); } );
 
-    dojo.connect( this, 'onConfigLoaded',  this, 'loadRefSeqs' );
+    dojo.connect( this, 'onConfigLoaded',  this, 'openDataSources' );
     dojo.connect( this, 'onConfigLoaded',  this, 'loadNames'   );
-    dojo.connect( this, 'onRefSeqsLoaded', this, 'initView'   );
+    dojo.connect( this, 'onDataSourcesLoaded', this, 'initView'   );
 };
 
-Browser.prototype.loadRefSeqs = function() {
-    // load our ref seqs
+/**
+ * Open handles for all the configured data sources.
+ */
+Browser.prototype.openDataSources = function() {
+    var source_def, source_name;
+
+    this.datasources = {};
+    for( source_name in this.config.datasources ) {
+        if( !this.config.datasource.hasOwnProperty(source_name))
+            continue;
+
+        source_def = this.config.datasources[source_name];
+        this.datasources[source_name] = this.openDataSource( source_name, source_def );
+    }
+
+    // load our ref seqs from data sources
     var that = this;
     if( typeof this.config.refSeqs == 'string' )
         this.config.refSeqs = { url: this.config.refSeqs };
@@ -65,6 +79,27 @@ Browser.prototype.loadRefSeqs = function() {
             }
         });
 };
+
+/**
+ * Open a single datasource based on a datasource definition.
+ * @return {Object} the object handle for the datasource
+ */
+Browser.prototype.openDataSource = function( name, def ) {
+    var adaptor_name = def.adaptor || 'SeqFeatureStore.NCList';
+    var adaptor_class = eval( ''+adaptor );
+    if( !adaptor_class ) {
+        console.error("Unable to find the "+adaptor_name+" adaptor for data source "+name+".  Is "+adaptor_name+" the correct adaptor name?" );
+        return null;
+    }
+    var adaptor = new adaptor_class(def);
+    if( !adaptor ) {
+        console.error("Unable to open data source "+name+".");
+        return null;
+    }
+
+    return adaptor;
+};
+
 
 /**
  * Event that fires when the reference sequences have been loaded.
@@ -242,7 +277,11 @@ Browser.prototype.loadConfig = function () {
 Browser.prototype.onConfigLoaded = function() {
 
     var initial_config = this.config;
-    this.config = {};
+
+    // start the merging process with the defaults
+    this.config = {
+        // no defaults yet
+    };
 
     // load all the configuration data in order
     dojo.forEach( initial_config.include, function( config ) {
@@ -254,6 +293,7 @@ Browser.prototype.onConfigLoaded = function() {
     // it overrides the other config
     this.addConfigData( initial_config );
 
+
     this.validateConfig();
 };
 
@@ -264,8 +304,8 @@ Browser.prototype.onConfigLoaded = function() {
  */
 Browser.prototype.validateConfig = function() {
     var c = this.config;
-    if( ! c.baseUrl ) {
-        throw "Must provide a baseUrl in config.";
+    if( ! c.datasources || c.datasources.length == 0 ) {
+        throw "Must provide at least one datasources in config.";
     }
 };
 

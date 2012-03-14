@@ -35,25 +35,11 @@ function FeatureTrack( config, refSeq, browserParams ) {
         track: this
     });
 
-    // connect the store and track loadSuccess and loadFailed events
-    // to eachother
-    dojo.connect( this.featureStore, 'loadSuccess', this, 'loadSuccess' );
-    dojo.connect( this.featureStore, 'loadFail',    this, 'loadFail' );
-
-    this.featureStore.load();
-
     //number of histogram bins per block
     this.numBins = 25;
     this.histLabel = false;
     this.padding = 5;
     this.trackPadding = browserParams.trackPadding;
-
-    this.config = config;
-}
-
-FeatureTrack.prototype = new Track("");
-
-FeatureTrack.prototype.loadSuccess = function(trackInfo, url) {
 
     var defaultConfig = {
         style: {
@@ -94,9 +80,7 @@ FeatureTrack.prototype.loadSuccess = function(trackInfo, url) {
             };
     }
 
-    Util.deepUpdate(defaultConfig, this.config);
-    this.config = defaultConfig;
-
+    this.config = Util.deepUpdate(defaultConfig, config);
     this.config.hooks.create = this.evalHook(this.config.hooks.create);
     this.config.hooks.modify = this.evalHook(this.config.hooks.modify);
 
@@ -105,9 +89,9 @@ FeatureTrack.prototype.loadSuccess = function(trackInfo, url) {
         this.eventHandlers[event] =
             this.wrapHandler(this.evalHook(this.config.events[event]));
     }
+}
 
-    this.setLoaded();
-};
+FeatureTrack.prototype = new Track("");
 
 FeatureTrack.prototype.evalHook = function(hook) {
     if (! ("string" == typeof hook)) return hook;
@@ -148,11 +132,14 @@ FeatureTrack.prototype.setViewInfo = function(genomeView, numBlocks,
 FeatureTrack.prototype.fillHist = function(blockIndex, block,
                                            leftBase, rightBase,
                                            stripeWidth) {
+
+    var histograms = this.featureStore.histograms( this.refSeq );
+
     // bases in each histogram bin that we're currently rendering
     var bpPerBin = (rightBase - leftBase) / this.numBins;
     var pxPerCount = 2;
     var logScale = false;
-    var stats = this.featureStore.histograms.stats;
+    var stats = histograms( this.refSeq ).stats;
     for (var i = 0; i < stats.length; i++) {
         if (stats[i].bases >= bpPerBin) {
             //console.log("bpPerBin: " + bpPerBin + ", histStats bases: " + this.histStats[i].bases + ", mean/max: " + (this.histStats[i].mean / this.histStats[i].max));
@@ -204,10 +191,10 @@ FeatureTrack.prototype.fillHist = function(blockIndex, block,
     // is at 50,000 bases/bin, and we have server histograms at 20,000
     // and 2,000 bases/bin, then we should choose the 2,000 histogramMeta
     // rather than the 20,000)
-    var histogramMeta = this.featureStore.histograms.meta[0];
-    for (var i = 0; i < this.featureStore.histograms.meta.length; i++) {
-        if (bpPerBin >= this.featureStore.histograms.meta[i].basesPerBin)
-            histogramMeta = this.featureStore.histograms.meta[i];
+    var histogramMeta = histograms.meta[0];
+    for (var i = 0; i < histograms.meta.length; i++) {
+        if (bpPerBin >= histograms.meta[i].basesPerBin)
+            histogramMeta = histograms.meta[i];
     }
 
     // number of bins in the server-supplied histogram for each current bin
@@ -238,7 +225,7 @@ FeatureTrack.prototype.fillHist = function(blockIndex, block,
         );
     } else {
         // make our own counts
-        this.featureStore.histogram( leftBase, rightBase,
+        this.featureStore.iterateHistogram( leftBase, rightBase,
                                      this.numBins, makeHistBlock);
     }
 };
@@ -373,12 +360,17 @@ FeatureTrack.prototype.fillFeatures = function(blockIndex, block,
     var startBase = goLeft ? rightBase : leftBase;
     var endBase = goLeft ? leftBase : rightBase;
 
-    this.featureStore.iterate(startBase, endBase, featCallback,
-                          function () {
-                              block.style.backgroundColor = "";
-                              curTrack.heightUpdate(layouter.totalHeight,
-                                                    blockIndex);
-                          });
+    this.featureStore.iterate({
+        refseq: this.refSeq,
+        start: startBase,
+        end: endBase,
+        feature: featCallback,
+        finish: function () {
+            block.style.backgroundColor = "";
+            curTrack.heightUpdate(layouter.totalHeight,
+                                  blockIndex);
+        }
+    );
 };
 
 FeatureTrack.prototype.measureStyles = function() {

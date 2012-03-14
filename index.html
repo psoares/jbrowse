@@ -54,19 +54,26 @@
            var queryParams = dojo.queryToObject( window.location.search.slice(1) );
            var dataRoot = queryParams.data || 'data';
            var b = new Browser({
-                                   containerID: "GenomeBrowser",
-                                   refSeqs: dataRoot + "/seq/refSeqs.json",
                                    include: [
                                      dataRoot + "/trackList.json",
                                    ],
-                                   nameUrl: dataRoot + "/names/root.json",
-                                   defaultTracks: "DNA,gene,mRNA,noncodingRNA",
-                                   queryParams: queryParams,
-                                   location: queryParams.loc,
-                                   forceTracks: queryParams.tracks,
-				   show_nav: queryParams.nav,
+
+                                   datasources: {
+                                       main: {
+                                           refSeqs: dataRoot + "/seq/refSeqs.json",
+                                           baseUrl: dataRoot,
+                                           nameUrl: dataRoot + "/names/root.json",
+                                       }
+                                   },
+
+                                   containerID:    "GenomeBrowser",
+                                   defaultTracks:  "DNA,gene,mRNA,noncodingRNA",
+                                   queryParams:    queryParams,
+                                   location:       queryParams.loc,
+                                   forceTracks:    queryParams.tracks,
+				   show_nav:       queryParams.nav,
 				   show_tracklist: queryParams.tracklist,
-				   show_overview: queryParams.overview
+				   show_overview:  queryParams.overview
                                });
     /* ]]> */
     </script>
