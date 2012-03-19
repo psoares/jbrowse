@@ -1,7 +1,7 @@
 {
    "tracks" : [
       {
-         "chunkSize" : 20000,
+         "datasource": "seqs",
          "type" : "SequenceTrack",
          "label" : "DNA",
          "key" : "DNA"
@@ -139,7 +139,6 @@
          "feature" : [
             "BAC"
          ],
-         "urlTemplate" : "tracks/Clones/{refseq}/trackData.json",
          "type" : "FeatureTrack",
          "label" : "Clones"
       },
@@ -156,8 +155,10 @@
          "type" : "FeatureTrack"
       },
       {
-         "datasource": 'microarray_wigtiles'
-
+         "datasource": {
+             adaptor: "TiledImageStore.Fixed",
+             url: "tracks/volvox_microarray.wig"
+         },
          "style" : {
             "className" : "image"
          },

@@ -53,41 +53,11 @@
     /* <![CDATA[ */
            var queryParams = dojo.queryToObject( window.location.search.slice(1) );
            var dataRoot = queryParams.data || 'data';
-           var b = new Browser({
-                                   include: [
-                                     dataRoot + "/trackList.json",
-                                   ],
-
-                                   datasources: {
-                                       main: {
-                                           adaptor: 'SeqFeatureStore.NCList'
-                                           baseUrl: dataRoot,
-                                       },
-                                       seqs: {
-                                           adaptor: 'SequenceStore.StaticChunked',
-                                           refSeqs: dataRoot + "/seq/refSeqs.json",
-                                       },
-                                       microarray_wigtiles: {
-                                           adaptor: 'TiledImageStore.Fixed',
-                                           baseUrl: dataRoot + 'tracks/volvox_microarray.wig'
-                                       }
-                                   },
-
-                                   nameUrl: dataRoot + "/names/root.json",
-
-                                   containerID:    "GenomeBrowser",
-                                   defaultTracks:  "DNA,gene,mRNA,noncodingRNA",
-                                   queryParams:    queryParams,
-                                   location:       queryParams.loc,
-                                   forceTracks:    queryParams.tracks,
-				   show_nav:       queryParams.nav,
-				   show_tracklist: queryParams.tracklist,
-				   show_overview:  queryParams.overview
-                               });
+           var b = new Browser({ defaultDataRoot: dataRoot, queryParams: queryParams });
     /* ]]> */
     </script>
   </head>
-  
+
   <body>
     <div id="GenomeBrowser" style="height: 100%; width: 100%; padding: 0; border: 0;"></div>
   </body>

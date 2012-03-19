@@ -33,7 +33,7 @@ var Browser = function(params) {
     this.tracks = [];
     this.isInitialized = false;
 
-    this.config = params;
+    this.initConfig( params );
 
     // load our touch device support
     // TODO: refactor this
@@ -274,14 +274,56 @@ Browser.prototype.loadConfig = function () {
     }, this);
 };
 
+/**
+ * Create the initial configuration based on the constructor
+ * parameters, and our internal defaults, before the loading of any
+ * configuration files.  Called at construction time.
+ */
+Browser.prototype.initConfig = function( /**Object*/ params ) {
+
+    var dataRoot    = params.defaultDataRoot || 'data';
+    var queryParams = params.queryParams     || dojo.queryToObject( window.location.search.slice(1) );
+
+    var default_config = {
+
+        include: [
+          dataRoot + "/trackList.json"
+        ],
+
+        datasources: {
+            main: {
+                adaptor: "SeqFeatureStore.NCList",
+                url: dataRoot + "tracks/{track}/{refseq}/trackData.json"
+            },
+            seqs: {
+                adaptor: "SequenceStore.StaticChunked",
+                url: dataRoot + "/seq/refSeqs.json"
+            }
+        },
+
+        names: {
+            adaptor: "NameStore.Static",
+            namesBaseUrl: dataRoot + "/names/root.json"
+        },
+
+        refSeqsDatasource: "seqs",
+
+        containerID:    "GenomeBrowser",
+        defaultTracks:  "DNA,gene,mRNA,noncodingRNA",
+        queryParams:    queryParams,
+        location:       queryParams.loc,
+        forceTracks:    queryParams.tracks,
+	show_nav:       queryParams.nav,
+	show_tracklist: queryParams.tracklist,
+	show_overview:  queryParams.overview
+    };
+
+    this.config = Util.deepUpdate( default_config, params );
+};
+
 Browser.prototype.onConfigLoaded = function() {
 
     var initial_config = this.config;
-
-    // start the merging process with the defaults
-    this.config = {
-        // no defaults yet
-    };
 
     // load all the configuration data in order
     dojo.forEach( initial_config.include, function( config ) {
@@ -292,7 +334,6 @@ Browser.prototype.onConfigLoaded = function() {
     // load the initial config (i.e. constructor params) last so that
     // it overrides the other config
     this.addConfigData( initial_config );
-
 
     this.validateConfig();
 };
