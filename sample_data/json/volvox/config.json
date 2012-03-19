@@ -156,6 +156,8 @@
          "type" : "FeatureTrack"
       },
       {
+         "datasource": 'microarray_wigtiles'
+
          "style" : {
             "className" : "image"
          },

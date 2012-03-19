@@ -60,11 +60,20 @@
 
                                    datasources: {
                                        main: {
-                                           refSeqs: dataRoot + "/seq/refSeqs.json",
+                                           adaptor: 'SeqFeatureStore.NCList'
                                            baseUrl: dataRoot,
-                                           nameUrl: dataRoot + "/names/root.json",
+                                       },
+                                       seqs: {
+                                           adaptor: 'SequenceStore.StaticChunked',
+                                           refSeqs: dataRoot + "/seq/refSeqs.json",
+                                       },
+                                       microarray_wigtiles: {
+                                           adaptor: 'TiledImageStore.Fixed',
+                                           baseUrl: dataRoot + 'tracks/volvox_microarray.wig'
                                        }
                                    },
+
+                                   nameUrl: dataRoot + "/names/root.json",
 
                                    containerID:    "GenomeBrowser",
                                    defaultTracks:  "DNA,gene,mRNA,noncodingRNA",
