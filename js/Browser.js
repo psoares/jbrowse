@@ -31,6 +31,7 @@ var Browser = function(params) {
 
     this.deferredFunctions = [];
     this.tracks = [];
+    this.anonymousDataSourceSerialNumber = 0;
     this.isInitialized = false;
 
     this.initConfig( params );
@@ -44,9 +45,10 @@ var Browser = function(params) {
     var browser = this;
     dojo.addOnLoad( function() { browser.loadConfig(); } );
 
-    dojo.connect( this, 'onConfigLoaded',  this, 'openDataSources' );
-    dojo.connect( this, 'onConfigLoaded',  this, 'loadNames'   );
-    dojo.connect( this, 'onDataSourcesLoaded', this, 'initView'   );
+    dojo.connect( this, 'onConfigLoaded',      this, Util.debugHandler( this, function(){ this.openDataSources() }));
+    dojo.connect( this, 'onDataSourcesLoaded', this, 'initView'    );
+    dojo.connect( this, 'onDataSourcesLoaded', this, 'loadRefSeqs' );
+    dojo.connect( this, 'onDataSourcesLoaded', this, 'loadNames'   );
 };
 
 /**
@@ -55,29 +57,34 @@ var Browser = function(params) {
 Browser.prototype.openDataSources = function() {
     var source_def, source_name;
 
-    this.datasources = {};
-    for( source_name in this.config.datasources ) {
-        if( !this.config.datasource.hasOwnProperty(source_name))
-            continue;
+    this.datasources = [];
+    this.datasourceOrder = [];
+    dojo.forEach( this.config.datasources, this.getDataSource, this );
+    this.onDataSourcesLoaded();
+};
 
-        source_def = this.config.datasources[source_name];
-        this.datasources[source_name] = this.openDataSource( source_name, source_def );
-    }
 
-    // load our ref seqs from data sources
-    var that = this;
-    if( typeof this.config.refSeqs == 'string' )
-        this.config.refSeqs = { url: this.config.refSeqs };
-    dojo.xhrGet(
-        {
-            url: this.config.refSeqs.url,
-            handleAs: 'json',
-            load: function(o) {
-                that.addRefseqs(o);
-                //that.onRefSeqsLoaded();
-                window.setTimeout(function() { that.onRefSeqsLoaded();},1);
-            }
-        });
+/**
+ * Get a datasource object from its name or definition object,
+ * instantiating and registering it if necessary.
+ * @returns {Object|String} the datasource
+ */
+Browser.prototype.getDataSource = function( /**Object*/ source ) {
+    var source_name = typeof source == 'string'
+        ? source
+        : ( source.name || 'anonymous_' + this.anonymousDataSourceSerialNumber++ );
+    return this.datasources[source_name] = this.datasources[source_name] || (function(that) {
+        var s = that.openDataSource( source_name, source );
+        that.datasourceOrder.push( source_name );
+        return s;
+    })(this);
+};
+
+/**
+ * Event called when all datasources have been loaded and opened
+ * successfully.
+ */
+Browser.prototype.onDataSourcesLoaded = function() {
 };
 
 /**
@@ -85,10 +92,13 @@ Browser.prototype.openDataSources = function() {
  * @return {Object} the object handle for the datasource
  */
 Browser.prototype.openDataSource = function( name, def ) {
+    if( typeof def != 'object' )
+        throw "Data source definition must be an object";
+
     var adaptor_name = def.adaptor || 'SeqFeatureStore.NCList';
-    var adaptor_class = eval( ''+adaptor );
+    var adaptor_class = eval( ''+adaptor_name );
     if( !adaptor_class ) {
-        console.error("Unable to find the "+adaptor_name+" adaptor for data source "+name+".  Is "+adaptor_name+" the correct adaptor name?" );
+        console.error( "Unable to find the "+adaptor_name+" adaptor for data source "+name+".  Is "+adaptor_name+" the correct adaptor name?" );
         return null;
     }
     var adaptor = new adaptor_class(def);
@@ -101,21 +111,49 @@ Browser.prototype.openDataSource = function( name, def ) {
 };
 
 
-/**
- * Event that fires when the reference sequences have been loaded.
- */
-Browser.prototype.onRefSeqsLoaded = function() {};
+Browser.prototype.loadRefSeqs = function() {
 
-/**
- * Load our name index.
- */
-Browser.prototype.loadNames = function() {
-    // load our name index
-    if (this.config.nameUrl)
-        this.names = new LazyTrie(this.config.nameUrl, "lazy-{Chunk}.json");
+    // load our ref seqs from data sources
+    var refseq_source = this.getDataSource( this.config.refSeqsDatasource );
+
+    refseq_source.whenReady( this, function( seq ) {
+            if( ! this.allRefs ) this.allRefs = {};
+            if( ! this.refSeq  ) this.refSeq = seq;
+            dojo.forEach( refseq_source.allSeqs(), function(seq) {
+                this.allRefs[seq.name] = seq;
+            });
+            this.onRefSeqsChanged();
+        });
 };
 
+/**
+ * Event that fires when the reference sequences have changed, either
+ * loaded or reloaded.
+ */
+Browser.prototype.onRefSeqsChanged = function() {};
+
+/**
+ * Puts our names datasource in place (the names datasource is what's
+ * used for finding and autocompleting names typed into the search
+ * box).
+ * @returns nothing meaningful
+ */
+Browser.prototype.loadNames = function() {
+    // load our name datasource
+    var names_source_def_or_name = this.config.namesDataSource || this.dataSourceOrder[0];
+    var names_source = this.getDataSource( names_source_def_or_name );
+    if( !names_source ) {
+        console.error("Unable to load names source");
+        console.log( names_source );
+    }
+    this.names = names_source;
+};
+
+/**
+ * Draw and otherwise set up the main view.
+ */
 Browser.prototype.initView = function() {
+
     //set up top nav/overview pane and main GenomeView pane
     dojo.addClass(document.body, "tundra");
     this.container = dojo.byId(this.config.containerID);
@@ -287,21 +325,23 @@ Browser.prototype.initConfig = function( /**Object*/ params ) {
     var default_config = {
 
         include: [
-          dataRoot + "/trackList.json"
+          dataRoot + "/config.json"
         ],
 
-        datasources: {
-            main: {
+        datasources: [
+            {
+                name: 'main',
                 adaptor: "SeqFeatureStore.NCList",
                 url: dataRoot + "tracks/{track}/{refseq}/trackData.json"
             },
-            seqs: {
+            {
+                name: 'seqs',
                 adaptor: "SequenceStore.StaticChunked",
                 url: dataRoot + "/seq/refSeqs.json"
             }
-        },
+        ],
 
-        names: {
+        namesDataSource: {
             adaptor: "NameStore.Static",
             namesBaseUrl: dataRoot + "/names/root.json"
         },
@@ -390,21 +430,8 @@ Browser.prototype.addConfigData = function( /**Object*/ config_data ) {
 };
 
 /**
- * @param refSeqs {Array} array of refseq records to add to the browser
- */
-Browser.prototype.addRefseqs = function( refSeqs ) {
-    this.allRefs = this.allRefs || {};
-    this.refSeq  = this.refSeq  || refSeqs[0];
-    dojo.forEach( refSeqs, function(r) {
-        this.allRefs[r.name] = r;
-    },this);
-};
-
-/**
  * @private
  */
-
-
 Browser.prototype.onFineMove = function(startbp, endbp) {
     var length = this.view.ref.end - this.view.ref.start;
     var trapLeft = Math.round((((startbp - this.view.ref.start) / length)

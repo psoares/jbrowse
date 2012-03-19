@@ -2,8 +2,8 @@
 var SequenceStore; if( !SequenceStore ) SequenceStore = {};
 
 /**
- * Storage backend for sequences broken up into chunks, stored and
- * served as static text files.
+ * Storage backend for sequences broken up into chunks, stored as
+ * static text files.
  * @class
  * @constructor
  * @extends Store

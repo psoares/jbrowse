@@ -156,8 +156,8 @@
       },
       {
          "datasource": {
-             adaptor: "TiledImageStore.Fixed",
-             url: "tracks/volvox_microarray.wig"
+             "adaptor": "TiledImageStore.Fixed",
+             "url": "tracks/volvox_microarray.wig"
          },
          "style" : {
             "className" : "image"

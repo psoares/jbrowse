@@ -85,16 +85,16 @@ SeqFeatureStore.NCList.prototype.iterateHistogram = function() {
 };
 
 
-SeqFeatureStore.NCList.prototype.iterate = function( startBase, endBase, origFeatCallback, finishCallback ) {
+SeqFeatureStore.NCList.prototype.iterate = function( args ) {
     var that = this;
     var accessors    = this.attrs.accessors(),
         /** @inner */
-        featCallBack = function( feature, path ) {
+        featCallback = function( feature, path ) {
             that._add_getters( accessors.get, feature );
-            return origFeatCallback( feature, path );
+            return args.featureCallback( feature, path );
         };
 
-    return this.nclist.iterate.call( this.nclist, startBase, endBase, featCallBack, finishCallback );
+    return this.nclist.iterate.call( this.nclist, args.start, args.end, featCallback, args.finishCallback );
 };
 
 /**

@@ -364,13 +364,13 @@ FeatureTrack.prototype.fillFeatures = function(blockIndex, block,
         refseq: this.refSeq,
         start: startBase,
         end: endBase,
-        feature: featCallback,
-        finish: function () {
+        featureCallback: featCallback,
+        finishCallback: function () {
             block.style.backgroundColor = "";
             curTrack.heightUpdate(layouter.totalHeight,
                                   blockIndex);
         }
-    );
+    });
 };
 
 FeatureTrack.prototype.measureStyles = function() {
