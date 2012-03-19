@@ -9,7 +9,6 @@ bin/wig2png
 *.pyc
 *TODO.txt
 Makefile
-/sample_data/json
 wig2png/config.log
 wig2png/config.status
 wig2png/src/config.h
