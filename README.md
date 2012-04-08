@@ -6,14 +6,21 @@ The rest of this file is aimed primarily at developers.
 
 # Running the developer test suites
 
-## Server-side Perl
+## Running Server-side Perl Unit and Integration Tests
 
 Tests for the server-side Perl code.  You must have the JBrowse Perl
 module prerequisites installed for them to work.  Run with:
 
     prove -lr t
 
-## Client-side Integration Tests
+## Running JavaScript Unit Tests (with node and node-tap)
+
+You need to have the node.js `node` executable in your path.  Run the
+tests with `prove`, like:
+
+    prove -lr tests/js_tests
+
+## Running Client Integration Tests (with Selenium)
 
 Integration tests for the client-side app.  You need to have Python
 eggs for `selenium` and `nose` installed.  Run the tests with:
