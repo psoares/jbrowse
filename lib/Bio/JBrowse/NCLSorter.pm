@@ -23,7 +23,7 @@ Containment List sorting algorithm.
 
 =cut
 
-package NCLSorter;
+package Bio::JBrowse::NCLSorter;
 use strict;
 use warnings;
 use Carp;

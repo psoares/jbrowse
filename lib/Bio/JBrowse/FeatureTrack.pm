@@ -11,7 +11,7 @@ operations on the feature data are not supported by this module.
 
 =cut
 
-package FeatureTrack;
+package Bio::JBrowse::FeatureTrack;
 
 use strict;
 use warnings;

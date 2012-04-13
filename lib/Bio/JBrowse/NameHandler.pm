@@ -21,7 +21,7 @@ NameHandler - create JSON indices of feature names
 
 =cut
 
-package NameHandler;
+package Bio::JBrowse::NameHandler;
 
 use strict;
 use warnings;

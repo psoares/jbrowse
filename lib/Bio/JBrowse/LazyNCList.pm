@@ -1,4 +1,4 @@
-package LazyNCList;
+package Bio::JBrowse::LazyNCList;
 
 use strict;
 use warnings;

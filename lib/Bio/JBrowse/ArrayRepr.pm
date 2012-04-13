@@ -1,4 +1,4 @@
-package ArrayRepr;
+package Bio::JBrowse::ArrayRepr;
 
 use strict;
 use warnings;

@@ -1,4 +1,4 @@
-package TiledImage;
+package Bio::JBrowse::TiledImage;
 
 =head1 NAME
 

@@ -29,7 +29,7 @@ ExternalSorter - efficiently sort arrayrefs with a given comparison function
 =cut
 
 
-package ExternalSorter;
+package Bio::JBrowse::ExternalSorter;
 
 use strict;
 use warnings;

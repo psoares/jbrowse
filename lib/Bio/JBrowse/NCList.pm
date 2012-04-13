@@ -5,7 +5,7 @@
 #Bioinformatics, doi:10.1093/bioinformatics/btl647
 #http://bioinformatics.oxfordjournals.org/cgi/content/abstract/btl647v1
 
-package NCList;
+package Bio::JBrowse::NCList;
 
 use strict;
 use warnings;

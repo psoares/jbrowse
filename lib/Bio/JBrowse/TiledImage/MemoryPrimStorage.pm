@@ -1,4 +1,4 @@
-package MemoryPrimStorage;
+package Bio::JBrowse::MemoryPrimStorage;
 
 use strict;
 use GD::Image;

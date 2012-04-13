@@ -32,7 +32,7 @@ Bio::DB::SeqFeature::Store methods for returning subsequences.
 
 =cut
 
-package FastaDatabase;
+package Bio::JBrowse::FastaDatabase;
 
 use strict;
 use warnings;

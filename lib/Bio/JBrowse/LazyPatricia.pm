@@ -63,7 +63,7 @@ fast lookups.
 
 =cut
 
-package LazyPatricia;
+package Bio::JBrowse::LazyPatricia;
 
 use strict;
 use warnings;

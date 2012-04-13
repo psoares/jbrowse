@@ -5,7 +5,7 @@ class for working with L<Bio::GFF3::LowLevel::Parser> features
 
 =cut
 
-package Script::FlatFileToJson::FeatureStream::GFF3_LowLevel;
+package Bio::JBrowse::Script::FlatFileToJson::FeatureStream::GFF3_LowLevel;
 use strict;
 use warnings;
 

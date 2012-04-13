@@ -10,7 +10,7 @@ Do C<perldoc bin/flatfile-to-json.pl> for most of the documentation.
 
 =cut
 
-package Script::FlatFileToJson;
+package Bio::JBrowse::Script::FlatFileToJson;
 
 use strict;
 use warnings;

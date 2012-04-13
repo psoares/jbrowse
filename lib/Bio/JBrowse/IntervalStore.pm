@@ -1,4 +1,4 @@
-package IntervalStore;
+package Bio::JBrowse::IntervalStore;
 
 use strict;
 use warnings;

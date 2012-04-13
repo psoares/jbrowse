@@ -25,7 +25,7 @@ contains.
 
 =cut
 
-package GenomeDB;
+package Bio::JBrowse::GenomeDB;
 
 use strict;
 use warnings;

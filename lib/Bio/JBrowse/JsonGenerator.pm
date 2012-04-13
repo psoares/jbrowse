@@ -1,4 +1,4 @@
-package JsonGenerator;
+package Bio::JBrowse::JsonGenerator;
 
 use base 'Exporter';
 our @EXPORT_OK = qw/ readJSON writeJSON modifyJsonFile /;

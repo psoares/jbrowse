@@ -19,7 +19,7 @@ JsonFileStorage - manage a directory structure of .json or .jsonz files
 
 =cut
 
-package JsonFileStorage;
+package Bio::JBrowse::JsonFileStorage;
 
 use strict;
 use warnings;

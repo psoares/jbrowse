@@ -20,7 +20,7 @@ BioperlFlattener - configurably transform BioPerl feature objects to arrayrefs
 
 =cut
 
-package BioperlFlattener;
+package Bio::JBrowse::BioperlFlattener;
 
 use strict;
 use warnings;

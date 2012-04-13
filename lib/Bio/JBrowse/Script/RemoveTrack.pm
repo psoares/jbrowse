@@ -8,7 +8,7 @@ Do C<perldoc bin/remove-track.pl> to see usage documentation.
 
 =cut
 
-package Script::RemoveTrack;
+package Bio::JBrowse::Script::RemoveTrack;
 use strict;
 use warnings;
 

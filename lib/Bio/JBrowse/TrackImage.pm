@@ -1,4 +1,4 @@
-package TrackImage;
+package Bio::JBrowse::TrackImage;
 
 =head1 NAME
 

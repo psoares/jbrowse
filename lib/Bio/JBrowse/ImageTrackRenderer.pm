@@ -1,4 +1,4 @@
-package ImageTrackRenderer;
+package Bio::JBrowse::ImageTrackRenderer;
 
 =head1 NAME
 

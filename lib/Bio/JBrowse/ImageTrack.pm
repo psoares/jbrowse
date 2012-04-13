@@ -11,7 +11,7 @@ the data are not supported by this module.
 
 =cut
 
-package ImageTrack;
+package Bio::JBrowse::ImageTrack;
 
 use strict;
 use warnings;

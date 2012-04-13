@@ -5,7 +5,7 @@ for working with BioPerl seqfeature objects
 
 =cut
 
-package Script::FlatFileToJson::FeatureStream::BioPerl;
+package Bio::JBrowse::Script::FlatFileToJson::FeatureStream::BioPerl;
 use strict;
 use warnings;
 use base 'Script::FlatFileToJson::FeatureStream';

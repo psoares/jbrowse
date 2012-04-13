@@ -1,4 +1,4 @@
-package DBPrimStorage;
+package Bio::JBrowse::DBPrimStorage;
 
 # TODO:
 # - doesn't clean up 'image' table when 'persistent' set to off, but should
