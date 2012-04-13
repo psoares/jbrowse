@@ -15,11 +15,11 @@ package Bio::JBrowse::Script::FlatFileToJson;
 use strict;
 use warnings;
 
-use base 'Script';
+use base 'Bio::JBrowse::Script';
 
-use ArrayRepr;
-use GenomeDB;
-use ExternalSorter;
+use Bio::JBrowse::ArrayRepr;
+use Bio::JBrowse::GenomeDB;
+use Bio::JBrowse::ExternalSorter;
 use JSON 2;
 
 sub option_defaults {
@@ -65,7 +65,7 @@ sub run {
     my $types = $self->opt('type');
     @$types = split /,/, join ',', @$types;
 
-    my $gdb = GenomeDB->new( $self->opt('out') );
+    my $gdb = Bio::JBrowse::GenomeDB->new( $self->opt('out') );
 
     Pod::Usage::pod2usage( "Must provide a --trackLabel parameter." ) unless defined $self->opt('trackLabel');
     unless( defined $self->opt('gff') || defined $self->opt('bed') || defined $self->opt('bam') ) {
@@ -110,9 +110,9 @@ sub run {
                          $self->opt('bed') ? $self->make_bed_stream( \%config ) :
                              die "Please specify --gff or --bed.\n";
 
-    # The ExternalSorter will get flattened [chrom, [start, end, ...]]
+    # The Bio::JBrowse::ExternalSorter will get flattened [chrom, [start, end, ...]]
     # arrays from the feature_stream
-    my $sorter = ExternalSorter->new(
+    my $sorter = Bio::JBrowse::ExternalSorter->new(
         do {
             my $startIndex = $feature_stream->startIndex;
             my $endIndex = $feature_stream->endIndex;
@@ -159,7 +159,7 @@ sub run {
 
     ################################
 
-    my $track = $gdb->getTrack( $self->opt('trackLabel'), { %config, type => 'FeatureTrack' }, $config{key} )
+    my $track = $gdb->getTrack( $self->opt('trackLabel'), { %config, type => 'Bio::JBrowse::FeatureTrack' }, $config{key} )
                 || $gdb->createFeatureTrack( $self->opt('trackLabel'),
                                              \%config,
                                              $config{key},
@@ -198,11 +198,11 @@ sub make_gff_stream {
     my $self = shift;
 
     require Bio::GFF3::LowLevel::Parser;
-    require Script::FlatFileToJson::FeatureStream::GFF3_LowLevel;
+    require Bio::JBrowse::Script::FlatFileToJson::FeatureStream::GFF3_LowLevel;
 
     my $p = Bio::GFF3::LowLevel::Parser->new( $self->opt('gff') );
 
-    return Script::FlatFileToJson::FeatureStream::GFF3_LowLevel->new(
+    return Bio::JBrowse::Script::FlatFileToJson::FeatureStream::GFF3_LowLevel->new(
         parser => $p,
         track_label => $self->opt('trackLabel')
      );
@@ -212,7 +212,7 @@ sub make_bed_stream {
     my ( $self, $config_hash ) = @_;
 
     require Bio::FeatureIO;
-    require Script::FlatFileToJson::FeatureStream::BioPerl;
+    require Bio::JBrowse::Script::FlatFileToJson::FeatureStream::BioPerl;
 
     my $io = Bio::FeatureIO->new(
         -format => 'bed',
@@ -221,7 +221,7 @@ sub make_bed_stream {
         ($self->opt('thickType') ? ("-thick_type" => $self->opt('thickType')) : ()),
         );
 
-    return Script::FlatFileToJson::FeatureStream::BioPerl->new(
+    return Bio::JBrowse::Script::FlatFileToJson::FeatureStream::BioPerl->new(
         stream => sub { $io->next_feature },
         track_label => $self->opt('trackLabel'),
     );

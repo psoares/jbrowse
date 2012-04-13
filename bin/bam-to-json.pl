@@ -65,7 +65,7 @@ use warnings;
 
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
-use JBlibs;
+use Bio::JBrowse::libs;
 
 use Pod::Usage;
 use Getopt::Long;
@@ -73,8 +73,8 @@ use Getopt::Long;
 use JSON 2;
 use Bio::DB::Sam;
 
-use GenomeDB;
-use NCLSorter;
+use Bio::JBrowse::GenomeDB;
+use Bio::JBrowse::NCLSorter;
 
 my ($tracks, $cssClass, $arrowheadClass, $subfeatureClasses, $clientConfig,
     $bamFile, $trackLabel, $key, $nclChunk, $compress);
@@ -105,7 +105,7 @@ unless( defined $nclChunk ) {
     $nclChunk *= 4 if $compress;
 }
 
-my $gdb = GenomeDB->new( $outdir );
+my $gdb = Bio::JBrowse::GenomeDB->new( $outdir );
 
 my @refSeqs = @{ $gdb->refSeqs }
   or die "Run prepare-refseqs.pl to define reference sequences before running this script.\n";
@@ -165,7 +165,7 @@ foreach my $seqInfo (@refSeqs) {
                        ],
                      );
 
-    my $sorter = NCLSorter->new( 1, 2, sub { $track->addSorted( $_[0]) } );
+    my $sorter = Bio::JBrowse::NCLSorter->new( 1, 2, sub { $track->addSorted( $_[0]) } );
     #$sorter->addSorted( [ 0, 23, 345, 1 ] );
     $index->fetch( $bam, $tid, $start, $end,
                    sub { $sorter->addSorted( align2array( $_[0] )) }

@@ -6,8 +6,8 @@ our @EXPORT_OK = qw/ readJSON writeJSON modifyJsonFile /;
 use strict;
 use warnings;
 
-use NCList;
-use LazyNCList;
+use Bio::JBrowse::NCList;
+use Bio::JBrowse::LazyNCList;
 use JSON 2;
 use IO::File;
 use Fcntl ":flock";
@@ -183,7 +183,7 @@ sub new {
     $featureCount = $refEnd * 0.25 unless defined($featureCount);
 
     # $histBinThresh is the approximate the number of bases per
-    # histogram bin at the zoom level where FeatureTrack.js switches
+    # histogram bin at the zoom level where Bio::JBrowse::FeatureTrack.js switches
     # to the histogram view by default
     my $histBinThresh = ($refEnd * 2.5) / $featureCount;
     $self->{histBinBases} = $multiples[0];
@@ -227,7 +227,7 @@ sub new {
     };
 
     $self->{sublistIndex} += 1 if ($self->{sublistIndex} == $lazyIndex);
-    $self->{features} = LazyNCList->new($startIndex, $endIndex,
+    $self->{features} = Bio::JBrowse::LazyNCList->new($startIndex, $endIndex,
                                         $self->{sublistIndex},
                                         $lazyIndex,
                                         $measure,
@@ -281,7 +281,7 @@ sub generateTrack {
     $features->finish();
 
     # approximate the number of bases per histogram bin at the zoom level where
-    # FeatureTrack.js switches to histogram view, by default
+    # Bio::JBrowse::FeatureTrack.js switches to histogram view, by default
     my $histBinThresh = ($self->{refEnd} * 2.5) / $self->{count};
 
     # find multiple of base hist bin size that's just over $histBinThresh
@@ -338,7 +338,7 @@ sub generateTrack {
                      'featureCount' =>
                          $self->{count},
                      'type' =>
-                         "FeatureTrack",
+                         "Bio::JBrowse::FeatureTrack",
                      'className' =>
                          $self->{style}->{class},
                      'subfeatureClasses' =>

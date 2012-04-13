@@ -6,7 +6,7 @@ NameHandler - create JSON indices of feature names
 
   # instantiate with a callback that gives the directory to use for a
   # given reference sequence
-  my $nameHandler = NameHandler->new(
+  my $nameHandler = Bio::JBrowse::NameHandler->new(
      sub { "$trackDir/" . $_[0] . "/" . $track->{"track"}; };
   );
 
@@ -40,7 +40,7 @@ my $nameFile = "names.json";
 
 =head1 new( \&directory_callback )
 
-Make a new NameHandler.  Takes a subroutine reference that should take
+Make a new Bio::JBrowse::NameHandler.  Takes a subroutine reference that should take
 a reference sequence name as an argument and return the path to the
 directory that should contain the name index we generate.
 

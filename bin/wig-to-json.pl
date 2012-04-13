@@ -87,7 +87,7 @@ use warnings;
 
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
-use JBlibs;
+use Bio::JBrowse::libs;
 
 use File::Basename;
 use Getopt::Long;
@@ -95,7 +95,7 @@ use Pod::Usage;
 
 use JSON 2;
 
-use GenomeDB;
+use Bio::JBrowse::GenomeDB;
 
 my ($path, $trackLabel, $key, $cssClass);
 my $outdir = "data";
@@ -130,7 +130,7 @@ GetOptions("wig=s"                   => \$path,
 pod2usage( -verbose => 2 ) if $help;
 pod2usage( 'Must provide a --wig argument.' ) unless defined $path;
 
-my $gdb = GenomeDB->new( $outdir );
+my $gdb = Bio::JBrowse::GenomeDB->new( $outdir );
 
 my @refSeqs = @{ $gdb->refSeqs }
    or die "Run prepare-refseqs.pl first to supply information about your reference sequences.\n";
@@ -147,11 +147,11 @@ my %style = (
     },
 );
 
-my $track = $gdb->getTrack( $trackLabel, \%style, $style{key}, 'ImageTrack.Wiggle' )
+my $track = $gdb->getTrack( $trackLabel, \%style, $style{key}, 'Bio::JBrowse::ImageTrack.Wiggle' )
    || $gdb->createImageTrack( $trackLabel,
                               \%style,
                               $style{key},
-                              'ImageTrack.Wiggle'
+                              'Bio::JBrowse::ImageTrack.Wiggle'
                             );
 $track->startLoad;
 

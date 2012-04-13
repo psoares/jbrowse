@@ -16,8 +16,8 @@ use JSON 2 ();
 use File::Path ();
 use File::Spec;
 
-use JsonFileStorage;
-use base 'Script';
+use Bio::JBrowse::JsonFileStorage;
+use base 'Bio::JBrowse::Script';
 
 sub option_defaults {
     ( dir => 'data/' )
@@ -46,7 +46,7 @@ sub delete_track {
     my $deleted_conf;
 
     # remove the track configuration and print it
-    JsonFileStorage->new( $self->opt('dir') )
+    Bio::JBrowse::JsonFileStorage->new( $self->opt('dir') )
                    ->modify( 'trackList.json', sub {
                          my ( $json ) = @_;
                          $json or die "The trackList.json file in ".$self->opt('dir')." could not be read.\n";

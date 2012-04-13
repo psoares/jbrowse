@@ -71,7 +71,7 @@ use warnings;
 
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
-use JBlibs;
+use Bio::JBrowse::libs;
 
 use File::Basename;
 use Getopt::Long;
@@ -79,7 +79,7 @@ use List::Util 'max';
 use Pod::Usage;
 use POSIX qw (abs ceil);
 
-use ImageTrackRenderer;
+use Bio::JBrowse::ImageTrackRenderer;
 
 my ($path, $trackLabel, $key, $cssClass);
 my $outdir      = "data";
@@ -144,7 +144,7 @@ while (my ($seqname, $gffArray) = each %$gff) {
 }
 
 # create the renderer
-my $renderer = ImageTrackRenderer->new(
+my $renderer = Bio::JBrowse::ImageTrackRenderer->new(
     "datadir"     => $outdir,
     "tilewidth"   => $tileWidth,
     "trackheight" => $trackHeight,

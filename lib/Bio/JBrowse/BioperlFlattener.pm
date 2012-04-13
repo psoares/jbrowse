@@ -4,15 +4,15 @@ BioperlFlattener - configurably transform BioPerl feature objects to arrayrefs
 
 =head1 SYNOPSIS
 
-  my $flattener = BioperlFlattener->new(
+  my $flattener = Bio::JBrowse::BioperlFlattener->new(
                       $track->{"track"},
                       \%style,
                       [],
                       [],
                     );
 
-  my $startCol = BioperlFlattener->startIndex;
-  my $endCol = BioperlFlattener->endIndex;
+  my $startCol = Bio::JBrowse::BioperlFlattener->startIndex;
+  my $endCol = Bio::JBrowse::BioperlFlattener->endIndex;
 
   my $arrayref = $flattener->flatten_to_feature($feature);
 
@@ -24,8 +24,8 @@ package Bio::JBrowse::BioperlFlattener;
 
 use strict;
 use warnings;
-use JsonGenerator;
-use NameHandler;
+use Bio::JBrowse::JsonGenerator;
+use Bio::JBrowse::NameHandler;
 
 #in JSON, features are represented by arrays (we could use
 #hashes, but then we'd have e.g. "start" and "end" in the JSON
@@ -39,7 +39,7 @@ my @featMap = (
 	      );
 
 my @mapHeaders = ( 'start', 'end', 'strand','source');
-#positions of "start" and "end" in @mapHeaders (for NCList)
+#positions of "start" and "end" in @mapHeaders (for Bio::JBrowse::NCList)
 my $startIndex = 1;
 my $endIndex   = 2;
 #position of the lazy subfeature file name in the fake feature.
@@ -71,7 +71,7 @@ sub new {
                  %builtinDefaults,
 		 %$setStyle);
 
-    JsonGenerator::evalSubStrings(\%style);
+    Bio::JBrowse::JsonGenerator::evalSubStrings(\%style);
 
     my $self = {};
 
@@ -184,7 +184,7 @@ sub new {
 =head2 flatten_to_feature( $feature_object, $class_index )
 
 Flatten a Bio::SeqFeatureI object into an arrayref representing the
-feature.  Takes an optional C<$class_index> for the L<ArrayRepr>
+feature.  Takes an optional C<$class_index> for the L<Bio::JBrowse::ArrayRepr>
 class.
 
 =cut
@@ -197,7 +197,7 @@ sub flatten_to_feature {
 =head2 flatten_to_name( $feature_object, $refseq_name )
 
 If appropriate for this track, flatten the feature to an arrayref
-suitable for passing to a L<NameHandler>.
+suitable for passing to a L<Bio::JBrowse::NameHandler>.
 
 Optionally takes a $refseq_name, the name of the reference sequence
 for this feature.
@@ -213,7 +213,7 @@ sub flatten_to_name {
     return unless $self->{getLabel} || $self->{getAlias};
 
     my @namerec = map scalar($_->($feature)), @{$self->{nameMap}};
-    $namerec[ $NameHandler::chromIndex ] = $segName if defined $segName;
+    $namerec[ $Bio::JBrowse::NameHandler::chromIndex ] = $segName if defined $segName;
 
     return \@namerec;
 }

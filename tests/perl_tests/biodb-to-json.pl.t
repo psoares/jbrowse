@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use JBlibs;
+use Bio::JBrowse::libs;
 
 use Test::More;
 
@@ -69,7 +69,7 @@ use FileSlurping 'slurp';
             'urlTemplate' => 'tracks/ExampleFeatures/{refseq}/trackData.json',
             'key' => 'Example Features',
             'label' => 'ExampleFeatures',
-            'type' => 'FeatureTrack'
+            'type' => 'Bio::JBrowse::FeatureTrack'
         },
         {
             'autocomplete' => 'all',
@@ -83,7 +83,7 @@ use FileSlurping 'slurp';
             'urlTemplate' => 'tracks/NameTest/{refseq}/trackData.json',
             'key' => 'Name test track',
             'label' => 'NameTest',
-            'type' => 'FeatureTrack'
+            'type' => 'Bio::JBrowse::FeatureTrack'
         },
         {
             'autocomplete' => 'all',
@@ -98,7 +98,7 @@ use FileSlurping 'slurp';
             'urlTemplate' => 'tracks/snps/{refseq}/trackData.json',
             'key' => 'Test SNPs',
             'label' => 'snps',
-            'type' => 'FeatureTrack'
+            'type' => 'Bio::JBrowse::FeatureTrack'
         },
         {
             'autocomplete' => 'all',
@@ -113,7 +113,7 @@ use FileSlurping 'slurp';
             'urlTemplate' => 'tracks/Motifs/{refseq}/trackData.json',
             'key' => 'Example motifs',
             'label' => 'Motifs',
-            'type' => 'FeatureTrack'
+            'type' => 'Bio::JBrowse::FeatureTrack'
         },
         {
             'autocomplete' => 'all',
@@ -129,7 +129,7 @@ use FileSlurping 'slurp';
             'urlTemplate' => 'tracks/Alignments/{refseq}/trackData.json',
             'key' => 'Example alignments',
             'label' => 'Alignments',
-            'type' => 'FeatureTrack'
+            'type' => 'Bio::JBrowse::FeatureTrack'
         },
         {
             'autocomplete' => 'all',
@@ -142,7 +142,7 @@ use FileSlurping 'slurp';
             'urlTemplate' => 'tracks/Genes/{refseq}/trackData.json',
             'key' => 'Protein-coding genes',
             'label' => 'Genes',
-            'type' => 'FeatureTrack'
+            'type' => 'Bio::JBrowse::FeatureTrack'
         },
         {
             'autocomplete' => 'all',
@@ -156,7 +156,7 @@ use FileSlurping 'slurp';
             'urlTemplate' => 'tracks/ReadingFrame/{refseq}/trackData.json',
             'key' => 'Frame usage',
             'label' => 'ReadingFrame',
-            'type' => 'FeatureTrack'
+            'type' => 'Bio::JBrowse::FeatureTrack'
         },
         {
             'autocomplete' => 'all',
@@ -176,7 +176,7 @@ use FileSlurping 'slurp';
             'urlTemplate' => 'tracks/CDS/{refseq}/trackData.json',
             'key' => 'Predicted genes',
             'label' => 'CDS',
-            'type' => 'FeatureTrack'
+            'type' => 'Bio::JBrowse::FeatureTrack'
         },
         {
             'autocomplete' => 'all',
@@ -200,7 +200,7 @@ use FileSlurping 'slurp';
             'urlTemplate' => 'tracks/Transcript/{refseq}/trackData.json',
             'key' => 'Exonerate predictions',
             'label' => 'Transcript',
-            'type' => 'FeatureTrack'
+            'type' => 'Bio::JBrowse::FeatureTrack'
         },
         {
             'autocomplete' => 'all',
@@ -214,7 +214,7 @@ use FileSlurping 'slurp';
             'urlTemplate' => 'tracks/Clones/{refseq}/trackData.json',
             'key' => 'Fingerprinted BACs',
             'label' => 'Clones',
-            'type' => 'FeatureTrack'
+            'type' => 'Bio::JBrowse::FeatureTrack'
         },
         {
             'autocomplete' => 'all',
@@ -227,7 +227,7 @@ use FileSlurping 'slurp';
             'urlTemplate' => 'tracks/EST/{refseq}/trackData.json',
             'key' => 'ESTs',
             'label' => 'EST',
-            'type' => 'FeatureTrack'
+            'type' => 'Bio::JBrowse::FeatureTrack'
         }
       ]
     },
@@ -372,7 +372,7 @@ use FileSlurping 'slurp';
       },
       'subfeatures' => bless( do{\(my $o = 1)}, 'JSON::XS::Boolean' ),
       'track' => 'Genes',
-      'type' => 'FeatureTrack',
+      'type' => 'Bio::JBrowse::FeatureTrack',
       'urlTemplate' => 'tracks/Genes/{refseq}/trackData.json'
     }
   ]

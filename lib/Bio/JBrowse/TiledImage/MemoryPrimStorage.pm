@@ -81,7 +81,7 @@ sub GDGetBoundedPrimitives {
 }
 
 # these next two are part of the primitive storage interface
-# but the MemoryPrimStorage class doesn't need them.
+# but the Bio::JBrowse::MemoryPrimStorage class doesn't need them.
 sub perTileCleanup {
 }
 

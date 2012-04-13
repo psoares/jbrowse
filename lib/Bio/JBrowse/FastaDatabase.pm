@@ -11,10 +11,10 @@ Bio::DB::SeqFeature::Store methods for returning subsequences.
 
 =head1 EXAMPLES
 
-  use FastaDatabase;
+  use Bio::JBrowse::FastaDatabase;
 
   # read sequences from FASTA file
-  my $db = FastaDatabase->from_fasta ( "sequences.fasta" );
+  my $db = Bio::JBrowse::FastaDatabase->from_fasta ( "sequences.fasta" );
 
   # get sequence IDs (i.e. names)
   my @ids = $db->seq_ids;
@@ -43,9 +43,9 @@ use Bio::Index::Fasta;
 
 =head2 from_fasta
 
-    my $db = FastaDatabase->from_fasta ( $filename );
+    my $db = Bio::JBrowse::FastaDatabase->from_fasta ( $filename );
 
-Creates a new FastaDatabase object, reading sequences from a FASTA file.
+Creates a new Bio::JBrowse::FastaDatabase object, reading sequences from a FASTA file.
 
 =cut
 

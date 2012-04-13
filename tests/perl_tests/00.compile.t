@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use JBlibs;
+use Bio::JBrowse::libs;
 
 use File::Spec;
 use File::Basename;

@@ -8,7 +8,7 @@ for working with BioPerl seqfeature objects
 package Bio::JBrowse::Script::FlatFileToJson::FeatureStream::BioPerl;
 use strict;
 use warnings;
-use base 'Script::FlatFileToJson::FeatureStream';
+use base 'Bio::JBrowse::Script::FlatFileToJson::FeatureStream';
 
 sub next_items {
     my ( $self ) = @_;

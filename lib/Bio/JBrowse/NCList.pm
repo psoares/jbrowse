@@ -1,6 +1,6 @@
 #After
 #Alekseyenko, A., and Lee, C. (2007).
-#Nested Containment List (NCList): A new algorithm for accelerating
+#Nested Containment List (Bio::JBrowse::NCList): A new algorithm for accelerating
 #   interval query of genome alignment and interval databases.
 #Bioinformatics, doi:10.1093/bioinformatics/btl647
 #http://bioinformatics.oxfordjournals.org/cgi/content/abstract/btl647v1
@@ -14,9 +14,9 @@ use List::Util qw(max);
 =head2 new
 
  Title   : new
- Usage   : NCList->new($start, $end, $setSublist, $featList)
- Function: create an NCList
- Returns : an NCList object
+ Usage   : Bio::JBrowse::NCList->new($start, $end, $setSublist, $featList)
+ Function: create an Bio::JBrowse::NCList
+ Returns : an Bio::JBrowse::NCList object
  Args    : $featList is a reference to an array of arrays;
               each of the inner arrays represents an interval.
            $start is a reference to a sub that, given an inner array from

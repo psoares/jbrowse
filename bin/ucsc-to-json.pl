@@ -94,7 +94,7 @@ use warnings;
 
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
-use JBlibs;
+use Bio::JBrowse::libs;
 
 use Pod::Usage;
 use Getopt::Long;
@@ -102,9 +102,9 @@ use List::Util qw(min max);
 
 use PerlIO::gzip;
 use JSON 2;
-use GenomeDB;
-use NameHandler;
-use ExternalSorter;
+use Bio::JBrowse::GenomeDB;
+use Bio::JBrowse::NameHandler;
+use Bio::JBrowse::ExternalSorter;
 
 my $trackdb = "trackDb";
 my ($indir, $tracks, $arrowheadClass, $subfeatureClasses, $clientConfig, $db,
@@ -140,7 +140,7 @@ if (!defined($nclChunk)) {
     $nclChunk *= 4 if $compress;
 }
 
-# the jbrowse NCList code requires that "start" and "end" be
+# the jbrowse Bio::JBrowse::NCList code requires that "start" and "end" be
 # the first and second fields in the array; @defaultHeaders and %typeMaps
 # are used to take the fields from the database and put them
 # into the order specified by @defaultHeaders
@@ -253,7 +253,7 @@ ENDJS
     };
 
     my %chromCounts;
-    my $sorter = ExternalSorter->new($compare, $sortMem);
+    my $sorter = Bio::JBrowse::ExternalSorter->new($compare, $sortMem);
     for_columns("$indir/" . $trackMeta->{tableName},
                 sub { 
                     $chromCounts{$_[0]->[$chromCol]} += 1;
@@ -262,7 +262,7 @@ ENDJS
     $sorter->finish();
 
     my $curChrom;
-    my $gdb = GenomeDB->new($outdir);
+    my $gdb = Bio::JBrowse::GenomeDB->new($outdir);
     my $track = $gdb->getTrack($tableName, $trackConfig, $trackConfig->{shortLabel} );
     unless (defined($track)) {
         $track = $gdb->createFeatureTrack($tableName,
@@ -274,8 +274,8 @@ ENDJS
         my $row = $sorter->get();
 
         # Features come out of the sorter in order (by $compare), so
-        # to have one JsonGenerator for each refseq, we need to create
-        # a new JsonGenerator at the beginning (!defined($curChrom)) and at
+        # to have one Bio::JBrowse::JsonGenerator for each refseq, we need to create
+        # a new Bio::JBrowse::JsonGenerator at the beginning (!defined($curChrom)) and at
         # every refseq transition ($curChrom ne $row->[$chromCol]) thereafter.
         # We also need to finish the last refseq at the end (!defined($row)).
         if ( !defined $row
@@ -361,7 +361,7 @@ sub makeConverter {
     # are the positions of those columns
 
     # returns a sub that converts a row from the source
-    # into an array ready for adding to a JsonGenerator,
+    # into an array ready for adding to a Bio::JBrowse::JsonGenerator,
     # and a reference to an array of header strings that
     # describe the arrays returned by the sub
     my ($orig_fields, $type) = @_;

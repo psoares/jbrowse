@@ -62,15 +62,15 @@ use warnings;
 
 use FindBin qw($RealBin);
 use lib "$RealBin/../lib";
-use JBlibs;
+use Bio::JBrowse::libs;
 
 use Pod::Usage;
 
 use Getopt::Long;
 use Data::Dumper;
-use GenomeDB;
-use BioperlFlattener;
-use ExternalSorter;
+use Bio::JBrowse::GenomeDB;
+use Bio::JBrowse::BioperlFlattener;
+use Bio::JBrowse::ExternalSorter;
 
 my ($confFile, $ref, $refid, $onlyLabel, $verbose, $nclChunk, $compress);
 my $outdir = "data";
@@ -100,7 +100,7 @@ if (!defined($nclChunk)) {
     $nclChunk *= 4 if $compress;
 }
 
-my $gdb = GenomeDB->new( $outdir );
+my $gdb = Bio::JBrowse::GenomeDB->new( $outdir );
 
 # determine which reference sequences we'll be operating on
 my @refSeqs = @{ $gdb->refSeqs };
@@ -116,7 +116,7 @@ die "run prepare-refseqs.pl first to supply information about your reference seq
 
 # read our conf file
 die "conf file '$confFile' not found or not readable" unless -r $confFile;
-my $config = JsonGenerator::readJSON($confFile);
+my $config = Bio::JBrowse::JsonGenerator::readJSON($confFile);
 
 # open and configure the db defined in the config file
 eval "require $config->{db_adaptor}; 1" or die $@;
@@ -168,7 +168,7 @@ foreach my $seg (@refSeqs) {
 
 
         # make the flattener, which converts bioperl features to arrayrefs
-        my $flattener = BioperlFlattener->new(
+        my $flattener = Bio::JBrowse::BioperlFlattener->new(
                             $trackCfg->{"track"},
                             $mergedTrackCfg,
                             [],
@@ -194,9 +194,9 @@ foreach my $seg (@refSeqs) {
         # make a sorting object, incrementally sorts the
         # features according to the passed callback
         my $sorter =  do {
-            my $startCol = BioperlFlattener->startIndex;
-            my $endCol   = BioperlFlattener->endIndex;
-            ExternalSorter->new(
+            my $startCol = Bio::JBrowse::BioperlFlattener->startIndex;
+            my $endCol   = Bio::JBrowse::BioperlFlattener->endIndex;
+            Bio::JBrowse::ExternalSorter->new(
                 sub ($$) {
                     $_[0]->[$startCol] <=> $_[1]->[$startCol]
                   ||

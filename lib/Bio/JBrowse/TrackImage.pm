@@ -8,7 +8,7 @@ TrackImage.pm
 
 Perl module to provide a GD-like interface for rendering a JBrowse track at a particular zoom level.
 
-See TiledImage.pm for inherited methods.
+See Bio::JBrowse::TiledImage.pm for inherited methods.
 
 =head1 METHODS
 
@@ -18,9 +18,9 @@ use strict;
 use warnings;
 use vars '@ISA';
 
-@ISA = qw (TiledImage);
+@ISA = qw (Bio::JBrowse::TiledImage);
 
-use TiledImage;
+use Bio::JBrowse::TiledImage;
 
 # new
 sub new {
@@ -29,10 +29,10 @@ sub new {
     for my $arg (keys %defaults) {
 	if (exists $args{$arg}) {
 	    $defaults{$arg} = $args{$arg};
-	    delete $args{$arg};  # hide from TiledImage constructor
+	    delete $args{$arg};  # hide from Bio::JBrowse::TiledImage constructor
 	}
     }
-    my $self = TiledImage->new (%args);
+    my $self = Bio::JBrowse::TiledImage->new (%args);
     while (my ($arg, $val) = each %defaults) {
 	$arg =~ s/^-//;
 	$self->{$arg} = $val;

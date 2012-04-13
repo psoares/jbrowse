@@ -4,8 +4,8 @@ use strict;
 use warnings;
 use Carp;
 
-use ArrayRepr;
-use LazyNCList;
+use Bio::JBrowse::ArrayRepr;
+use Bio::JBrowse::LazyNCList;
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ IntervalStore - manages a set of intervals (genomic features)
 =head1 SYNOPSIS
 
   my $js = JsonStore->new($pathTempl, $compress);
-  my $is = IntervalStore->new({
+  my $is = Bio::JBrowse::IntervalStore->new({
                store   => $js,
                classes => [
                    {
@@ -38,30 +38,30 @@ IntervalStore - manages a set of intervals (genomic features)
 =head2 new
 
  Title   : new
- Usage   : IntervalStore->new(
+ Usage   : Bio::JBrowse::IntervalStore->new(
                store => $js,
                classes => {attributes => ["Start", "End", "Strand"]},
            )
- Function: create an IntervalStore
- Returns : an IntervalStore object
- Args    : The IntervalStore constuctor accepts the named parameters:
+ Function: create an Bio::JBrowse::IntervalStore
+ Returns : an Bio::JBrowse::IntervalStore object
+ Args    : The Bio::JBrowse::IntervalStore constuctor accepts the named parameters:
            store: object with put(path, data) method, will be used to output
                   feature data
            classes: describes the feature arrays; will be used to construct
-                    an ArrayRepr
+                    an Bio::JBrowse::ArrayRepr
            urlTemplate (optional): template for URLs where chunks of feature
                                    data will be stored.  This is relative to
                                    the directory with the "trackData.json" file
            lazyClass (optional): index in classes->{attributes} array for
                                  the class indicating a lazy feature
            nclist (optional): the root of the nclist
-           count (optional): the number of intervals in this IntervalStore
+           count (optional): the number of intervals in this Bio::JBrowse::IntervalStore
            minStart (optional): the earliest interval start point
            maxEnd (optional): the latest interval end point
 
-           If this IntervalStore hasn't been loaded yet, the optional
+           If this Bio::JBrowse::IntervalStore hasn't been loaded yet, the optional
            parameters aren't necessary.  But to access a previously-loaded
-           IntervalStore, the optional parameters *are* needed.
+           Bio::JBrowse::IntervalStore, the optional parameters *are* needed.
 
 =cut
 
@@ -74,7 +74,7 @@ sub new {
                 lazyClass => $args->{lazyClass},
                 urlTemplate => $args->{urlTemplate} || ("lf-{Chunk}"
                                                         . $args->{store}->ext),
-                attrs => ArrayRepr->new($args->{classes}),
+                attrs => Bio::JBrowse::ArrayRepr->new($args->{classes}),
                 nclist => $args->{nclist},
                 minStart => $args->{minStart},
                 maxEnd => $args->{maxEnd},
@@ -84,7 +84,7 @@ sub new {
     if (defined($args->{nclist})) {
         # we're already loaded
         $self->{lazyNCList} = 
-          LazyNCList->importExisting($self->{attrs},
+          Bio::JBrowse::LazyNCList->importExisting($self->{attrs},
 				     $args->{lazyClass},
                                      $args->{count},
                                      $args->{minStart},
@@ -120,7 +120,7 @@ sub startLoad {
     my ($self, $measure, $chunkBytes) = @_;
 
     if (defined($self->{nclist})) {
-        confess "loading into an already-loaded IntervalStore";
+        confess "loading into an already-loaded Bio::JBrowse::IntervalStore";
     } else {
         # add a new class for "fake" features
         push @{$self->{classes}}, {
@@ -137,9 +137,9 @@ sub startLoad {
             (my $path = $self->{urlTemplate}) =~ s/\{Chunk\}/$chunkId/g;
             $self->{store}->put($path, $toStore);
         };
-        $self->{attrs} = ArrayRepr->new($self->{classes});
+        $self->{attrs} = Bio::JBrowse::ArrayRepr->new($self->{classes});
         $self->{lazyNCList} =
-          LazyNCList->new($self->{attrs},
+          Bio::JBrowse::LazyNCList->new($self->{attrs},
 			  $self->{lazyClass},
                           $makeLazy,
                           sub { $self->_loadChunk( @_); },
@@ -191,9 +191,9 @@ sub classes      { shift->{classes}           }
 =head2 descriptor
 
  Title   : descriptor
- Usage   : IntervalStore->descriptor()
+ Usage   : Bio::JBrowse::IntervalStore->descriptor()
  Returns : a hash containing the data needed to re-construct this
-           IntervalStore, including the root of the NCList plus some
+           Bio::JBrowse::IntervalStore, including the root of the Bio::JBrowse::NCList plus some
            metadata and configuration.
            The return value can be passed to the constructor later.
 

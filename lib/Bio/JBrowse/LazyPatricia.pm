@@ -4,7 +4,7 @@ LazyPatricia - a lazy PATRICIA tree
 
 =head1 SYNOPSIS
 
-  my $trie = LazyPatricia::create({abc=>0, abcd=>1, abce=>2,abfoo=>3});
+  my $trie = Bio::JBrowse::LazyPatricia::create({abc=>0, abcd=>1, abce=>2,abfoo=>3});
   use JSON 2;
   print JSON::to_json($trie, {pretty=>1});
 

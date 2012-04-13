@@ -20,9 +20,9 @@ use File::Spec;
 use List::Util qw( min max first );
 use POSIX qw (ceil);
 
-use IntervalStore;
-use JsonFileStorage;
-use NameHandler;
+use Bio::JBrowse::IntervalStore;
+use Bio::JBrowse::JsonFileStorage;
+use Bio::JBrowse::NameHandler;
 
 sub new {
     my ($class, $trackDirTemplate, $baseUrl, $label, $config, $key, $jsclass) = @_;
@@ -34,7 +34,7 @@ sub new {
         key               => $key || $label,
         trackDataFilename => "trackData.json" . ( $config->{compress} ? 'z' : '' ),
         config            => $config,
-        jsclass           => $jsclass || 'ImageTrack',
+        jsclass           => $jsclass || 'Bio::JBrowse::ImageTrack',
       };
 
     $config->{urlTemplate} = $baseUrl . "/" . $self->{trackDataFilename}
@@ -54,7 +54,7 @@ sub config { return shift->{config}; }
 
 Starts loading.  Takes the name of the reference
 seq, the number of bytes in a chunk, and an arrayref containing the
-L<ArrayRepr> definitions for each feature class.
+L<Bio::JBrowse::ArrayRepr> definitions for each feature class.
 
 Example:
 

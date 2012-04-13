@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use JBlibs;
+use Bio::JBrowse::libs;
 
 use Test::More;
 use List::Util 'sum';
@@ -12,15 +12,15 @@ use JSON 2;
 
 #use Data::Visitor::Callback;
 
-use ArrayRepr;
+use Bio::JBrowse::ArrayRepr;
 
-use_ok('LazyNCList');
+use_ok('Bio::JBrowse::LazyNCList');
 
 my $lazyClass = 2;
 my %nclist_output;
-my $list = LazyNCList->new(
+my $list = Bio::JBrowse::LazyNCList->new(
     # array spec
-    ArrayRepr->new([
+    Bio::JBrowse::ArrayRepr->new([
         { attributes => [qw( Start End Strand Id Name Subfeatures )],
           isArrayAttr => { 'Subfeatures' => 1 },
         },
@@ -66,7 +66,7 @@ $list->finish;
     local $TODO = 'not causing problems right now, but needs to be fixed';
     is_deeply( $features,
                $features_clone,
-               'LazyNCList did not modify the features it was passed' );
+               'Bio::JBrowse::LazyNCList did not modify the features it was passed' );
 
     #find_missing_features( $features_clone, \%nclist_output );
 
@@ -143,7 +143,7 @@ sub find_missing_features {
         my $count = $output_features{$key} || 0;
         next if $count == 1;
         $irregular_count++;
-        diag "PROBLEM: feature seen $count time(s) in LazyNCList output:\n$key\n";
+        diag "PROBLEM: feature seen $count time(s) in Bio::JBrowse::LazyNCList output:\n$key\n";
     }
 
     is( $irregular_count, 0, "$irregular_count total irregular features" );

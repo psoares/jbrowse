@@ -20,7 +20,7 @@ use File::Spec;
 use File::Next;
 use JSON 2 ();
 
-use JsonFileStorage;
+use Bio::JBrowse::JsonFileStorage;
 
 =head2 slurp_tree( $dir )
 
@@ -35,8 +35,8 @@ sub slurp_tree {
 
     my %data;
 
-    my $storage   = JsonFileStorage->new( $dir );
-    my $storage_z = JsonFileStorage->new( $dir, 'compress' );
+    my $storage   = Bio::JBrowse::JsonFileStorage->new( $dir );
+    my $storage_z = Bio::JBrowse::JsonFileStorage->new( $dir, 'compress' );
 
     my $output_files_iter = File::Next::files( $dir );
     while( my $file = $output_files_iter->() ) {

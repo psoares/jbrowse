@@ -19,7 +19,7 @@ BEGIN {
     }
 }
 
-# Global table of TiledImage's for cleanup
+# Global table of Bio::JBrowse::TiledImage's for cleanup
 my %tiledImageCleanup;
 
 my %storeImagePrims = (
@@ -259,16 +259,16 @@ sub new {
 
     if ($tiledimage_id = GDFetchExistingTiledImage ($gdtile, $tiledimage_name))
     {
-      # we already have stuff for this TiledImage, so use its dimensions
+      # we already have stuff for this Bio::JBrowse::TiledImage, so use its dimensions
       ($width, $height) = GDFetchTiledImageDimensions ($gdtile, $tiledimage_id);
-      warn "reusing existing TiledImage (id = $tiledimage_id)\n" if $verbose;
+      warn "reusing existing Bio::JBrowse::TiledImage (id = $tiledimage_id)\n" if $verbose;
     }
     else
     {
-      # need to create new TiledImage
+      # need to create new Bio::JBrowse::TiledImage
       ($width, $height) = ($args{'-width'}, $args{'-height'});
       $tiledimage_id = GDCreateTiledImage ($gdtile, $tiledimage_name, $width, $height);
-      warn "creating new TiledImage (id = $tiledimage_id)\n" if $verbose;
+      warn "creating new Bio::JBrowse::TiledImage (id = $tiledimage_id)\n" if $verbose;
     }
 
     # prepare SQL queries

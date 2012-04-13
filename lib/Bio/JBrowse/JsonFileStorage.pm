@@ -4,7 +4,7 @@ JsonFileStorage - manage a directory structure of .json or .jsonz files
 
 =head1 SYNOPSIS
 
-    my $storage = JsonFileStorage->new( $outDir, $self->config->{compress} );
+    my $storage = Bio::JBrowse::JsonFileStorage->new( $outDir, $self->config->{compress} );
     $storage->put( 'relative/path/to/file.jsonz', \%data );
     my $data = $storage->get( 'relative/path/to/file.jsonz' );
 
@@ -69,10 +69,10 @@ sub _write_htaccess {
     my ( $self ) = @_;
     if( $self->{compress} && ! $self->{htaccess_written} ) {
         require IO::File;
-        require GenomeDB;
+        require Bio::JBrowse::GenomeDB;
         my $hn = File::Spec->catfile( $self->{outDir}, '.htaccess' );
         open my $h, '>', $hn or die "$! writing $hn";
-        $h->print( GenomeDB->precompression_htaccess( '.jsonz', '.txtz', '.txt.gz' ));
+        $h->print( Bio::JBrowse::GenomeDB->precompression_htaccess( '.jsonz', '.txtz', '.txt.gz' ));
         $self->{htaccess_written} = 1;
     }
 }

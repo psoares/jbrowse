@@ -5,18 +5,18 @@ use warnings;
 use Carp;
 use List::Util qw(max);
 
-use NCList;
+use Bio::JBrowse::NCList;
 
 =head2 new
 
  Title   : new
- Usage   : LazyNCList->new($attrs, $lazyClass, $makeLazy,
+ Usage   : Bio::JBrowse::LazyNCList->new($attrs, $lazyClass, $makeLazy,
                            $measure, $output, $sizeThresh
- Function: create an LazyNCList
- Returns : an LazyNCList object
- Args    : $attrs is a reference to an ArrayRepr instance
+ Function: create an Bio::JBrowse::LazyNCList
+ Returns : an Bio::JBrowse::LazyNCList object
+ Args    : $attrs is a reference to an Bio::JBrowse::ArrayRepr instance
            $lazyClass is the class number to be used for 'lazy'
-              NCLists, which are references to sub-lists,
+              Bio::JBrowse::NCLists, which are references to sub-lists,
            $makeLazy is a reference to a sub taking the arguments
               (start, end, ID), which returns a "lazy feature" with the
               given attributes
@@ -81,10 +81,10 @@ sub importExisting {
 
  Title   : addSorted
  Usage   : $ncl->addSorted($feat)
- Function: Adds a single feature to the set of features in this LazyNCList;
+ Function: Adds a single feature to the set of features in this Bio::JBrowse::LazyNCList;
            features passed to this method are accumulated into "chunks";
            once a chunk grows to sizeThresh, the chunk is output.
-           The features given to addSorted must be sorted by the NCList sort.
+           The features given to addSorted must be sorted by the Bio::JBrowse::NCList sort.
  Returns : nothing meaningful
  Args    : $feat is the feature to be added;
 
@@ -114,7 +114,7 @@ sub addSorted {
                                 &&
                                     ($end->($lastAdded) < $end->($feat)));
     } else {
-        # LazyNCList requires sorted input, so the start of the first feat
+        # Bio::JBrowse::LazyNCList requires sorted input, so the start of the first feat
         # is the minStart
         $self->{minStart} = $start->($feat);
     }
@@ -125,7 +125,7 @@ sub addSorted {
     my $partialStack = $self->{partialStack};
 
     for (my $level = 0; $level <= $#$partialStack; $level++) {
-        # due to NCList nesting, among other things, it's hard to be exactly
+        # due to Bio::JBrowse::NCList nesting, among other things, it's hard to be exactly
         # precise about the size of the JSON serialization, but this will get
         # us pretty close.
         my $featSize     = $self->{measure}->($feat);
@@ -136,7 +136,7 @@ sub addSorted {
         if ( $proposedChunkSize > $self->{sizeThresh} && @{$partialStack->[$level]} ){
             # then we're finished with the current "partial" chunk (i.e.,
             # it's now a "complete" chunk rather than a partial one), so
-            # create a new NCList to hold all the features in this chunk.
+            # create a new Bio::JBrowse::NCList to hold all the features in this chunk.
             my $lazyFeat = $self->finishChunk( $partialStack->[$level] );
 
             # start a new partial chunk with the current feature
@@ -169,7 +169,7 @@ sub addNewLevel {
 
 sub finishChunk {
     my ($self, $featList) = @_;
-    my $newNcl = NCList->new($self->{start},
+    my $newNcl = Bio::JBrowse::NCList->new($self->{start},
                              $self->{end},
                              $self->{setSublist},
                              $featList);
@@ -210,7 +210,7 @@ sub finish {
 
     # make sure there's a top-level NCL
     $level = $#{$self->{partialStack}};
-    my $newNcl = NCList->new($self->{start},
+    my $newNcl = Bio::JBrowse::NCList->new($self->{start},
                              $self->{end},
                              $self->{setSublist},
                              $self->{partialStack}->[$level]);
@@ -281,7 +281,7 @@ iterates right-to-left.
 sub overlapCallback {
     my ($self, $from, $to, $fun) = @_;
 
-    croak "LazyNCList not loaded" unless defined($self->{topLevelList});
+    croak "Bio::JBrowse::LazyNCList not loaded" unless defined($self->{topLevelList});
 
     return unless $self->count;
 

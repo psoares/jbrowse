@@ -6,7 +6,7 @@ ImageTrackRenderer - render JBrowse image tracks using a chromosome-sized virtua
 
 =head1 SYNOPSIS
 
-   my $renderer = ImageTrackRenderer->new(
+   my $renderer = Bio::JBrowse::ImageTrackRenderer->new(
        "datadir"     => $outdir,
        "tilewidth"   => $tileWidth,
        "trackheight" => $trackHeight,
@@ -54,14 +54,14 @@ use File::Path ();
 
 use JSON 2 ();
 
-use GenomeDB;
-use TrackImage;
+use Bio::JBrowse::GenomeDB;
+use Bio::JBrowse::TrackImage;
 
 =head2 new
 
-    my $renderer = ImageTrackRenderer->new(%args);
+    my $renderer = Bio::JBrowse::ImageTrackRenderer->new(%args);
 
-Creates a new ImageTrackRenderer object.
+Creates a new Bio::JBrowse::ImageTrackRenderer object.
 
 %args is a key-value hash with the following keys:
 
@@ -77,7 +77,7 @@ Creates a new ImageTrackRenderer object.
 
 =item B<key>: the key. defaults to whatever 'tracklabel' is
 
-=item B<drawsub>: reference to a subroutine taking two arguments ($im,$seqInfo) where $im is a TrackImage and $seqInfo is a reference to the sequence info hash (keys include "length" and "name"). This subroutine will be called for every refseq.
+=item B<drawsub>: reference to a subroutine taking two arguments ($im,$seqInfo) where $im is a Bio::JBrowse::TrackImage and $seqInfo is a reference to the sequence info hash (keys include "length" and "name"). This subroutine will be called for every refseq.
 
 =item B<link>: flag indicating whether to use filesystem links to repeat identical tiles. True by default; set to zero to disable this feature
 
@@ -114,7 +114,7 @@ sub new {
     # lazily import the md5_hex function if we're to use MD5 identity-linking
     eval "require Digest::MD5" if $self->link;
 
-    $self->{_genomedb} = GenomeDB->new( $self->datadir );
+    $self->{_genomedb} = Bio::JBrowse::GenomeDB->new( $self->datadir );
     $self->{_imagetrack} =
         $self->_genomedb->createImageTrack(
             $self->tracklabel,
@@ -155,7 +155,7 @@ sub render {
 	for my $basesPerPixel ( @{ $self->zooms } ) {
 	    print "working on seq $seqName, bases per pixel $basesPerPixel\n";
 	    # create virtual image
-	    my $im = TrackImage->new(
+	    my $im = Bio::JBrowse::TrackImage->new(
                          '-width'           => POSIX::ceil( $seqLen/$basesPerPixel ),
                          '-height'          => $self->trackheight,
                          '-tile_width_hint' => $self->tilewidth,
@@ -175,7 +175,7 @@ sub render {
 		++$tile;
 	    }
 
-	    # allow the TiledImage to clean up
+	    # allow the Bio::JBrowse::TiledImage to clean up
 	    $im->cleanup();
 	}
 
@@ -187,7 +187,7 @@ sub render {
 
 =head2 drawzoom
 
-    $im = new TiledImage ('-width'=>..., '-height'=>...);
+    $im = new Bio::JBrowse::TiledImage ('-width'=>..., '-height'=>...);
     $seqInfo = { "name" => ...,
                  "length" => ...,
                  ... };

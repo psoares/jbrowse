@@ -2,11 +2,11 @@
 use strict;
 use FindBin qw($RealBin);
 use lib "$RealBin/../lib";
-use JBlibs;
+use Bio::JBrowse::libs;
 
-use Script::FlatFileToJson;
+use Bio::JBrowse::Script::FlatFileToJson;
 
-exit Script::FlatFileToJson->new(@ARGV)->run;
+exit Bio::JBrowse::Script::FlatFileToJson->new(@ARGV)->run;
 
 __END__
 

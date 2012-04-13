@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-use JBlibs;
+use Bio::JBrowse::libs;
 use Test::More;
 
-use_ok('NCList');
+use_ok('Bio::JBrowse::NCList');
 
 my @test_subs = (
       sub { $_[0][0] },
@@ -18,7 +18,7 @@ my @test_subs = (
       [ 123, 340 ],
       [ 48, 49 ],
   );
-  my $list = NCList->new(
+  my $list = Bio::JBrowse::NCList->new(
       @test_subs,
       \@features
   );
@@ -41,7 +41,7 @@ my @test_subs = (
     ) or diag explain $list->nestedList;
 }
 {
-  my $list = NCList->new(
+  my $list = Bio::JBrowse::NCList->new(
       @test_subs,
       [],
   );

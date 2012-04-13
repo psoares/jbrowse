@@ -20,9 +20,9 @@ use File::Spec;
 use List::Util qw( min max sum first );
 use POSIX qw (ceil);
 
-use IntervalStore;
-use JsonFileStorage;
-use NameHandler;
+use Bio::JBrowse::IntervalStore;
+use Bio::JBrowse::JsonFileStorage;
+use Bio::JBrowse::NameHandler;
 
 sub new {
     my ($class, $trackDirTemplate, $baseUrl, $label, $config, $key, $jsclass) = @_;
@@ -35,7 +35,7 @@ sub new {
                 trackDataFilename => "trackData" . ($config->{compress} ?
                                                     ".jsonz" : ".json"),
                 config => $config,
-                jsclass => $jsclass || 'FeatureTrack',
+                jsclass => $jsclass || 'Bio::JBrowse::FeatureTrack',
                };
     $config->{urlTemplate} = $baseUrl . "/" . $self->{trackDataFilename}
       unless defined($config->{urlTemplate});
@@ -53,7 +53,7 @@ sub config { return shift->{config}; }
 
 Starts loading for a given refseq.  Takes the name of the reference
 seq, the number of bytes in a chunk, and an arrayref containing the
-L<ArrayRepr> definitions for each feature class.
+L<Bio::JBrowse::ArrayRepr> definitions for each feature class.
 
 Example:
 
@@ -68,10 +68,10 @@ sub startLoad {
     (my $outDir = $self->{trackDirTemplate}) =~ s/\{refseq\}/$refSeq/g;
     rmtree($outDir) if (-d $outDir);
 
-    my $jsonStore = JsonFileStorage->new($outDir, $self->config->{compress});
+    my $jsonStore = Bio::JBrowse::JsonFileStorage->new($outDir, $self->config->{compress});
     $self->_make_nameHandler;
     my $intervalStore = $self->{intervalStore} =
-        IntervalStore->new({store => $jsonStore,
+        Bio::JBrowse::IntervalStore->new({store => $jsonStore,
                             classes => $classes });
 
     # add 1 for the comma between features in the JSON arrays
@@ -135,7 +135,7 @@ sub DESTROY { $_[0]->finishLoad }
 
 =head2 nameHandler
 
-Return a NameHandler object configured to generate name files for this
+Return a Bio::JBrowse::NameHandler object configured to generate name files for this
 track.  Not available until startLoad() is called.
 
 =cut
@@ -144,7 +144,7 @@ sub nameHandler { $_[0]->{nameHandler} }
 sub _make_nameHandler {
     my ( $self ) = @_;
     (my $trackdir = $self->{trackDirTemplate}) =~ s/\{refseq\}/'$_[0]'/eg;
-    $self->{nameHandler} = NameHandler->new( eval qq|sub { "$trackdir" }| );
+    $self->{nameHandler} = Bio::JBrowse::NameHandler->new( eval qq|sub { "$trackdir" }| );
 }
 
 
@@ -156,7 +156,7 @@ sub writeHistograms {
                      100_000, 200_000, 500_000, 1_000_000);
     my $histChunkSize = 10_000;
 
-    my $attrs = ArrayRepr->new($ivalStore->classes);
+    my $attrs = Bio::JBrowse::ArrayRepr->new($ivalStore->classes);
     my $getStart = $attrs->makeFastGetter("Start");
     my $getEnd = $attrs->makeFastGetter("End");
 
@@ -165,7 +165,7 @@ sub writeHistograms {
     my $featureCount = $ivalStore->count;
 
     # $histBinThresh is the approximate the number of bases per
-    # histogram bin at the zoom level where FeatureTrack.js switches
+    # histogram bin at the zoom level where Bio::JBrowse::FeatureTrack.js switches
     # to the histogram view by default
     my $histBinThresh = $featureCount ? ($refEnd * 2.5) / $featureCount : 999_999_999_999;
     my $histBinBases  = ( first { $_ > $histBinThresh } @multiples ) || $multiples[-1];

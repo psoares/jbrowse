@@ -65,10 +65,10 @@ use POSIX;
 use Getopt::Long;
 
 use lib "$Bin/../lib";
-use JBlibs;
+use Bio::JBrowse::libs;
 
-use JsonGenerator;
-use FastaDatabase;
+use Bio::JBrowse::JsonGenerator;
+use Bio::JBrowse::FastaDatabase;
 
 my ($confFile, $noSeq, $gff, @fasta, $refs, $refids);
 my $chunkSize = 20000;
@@ -123,7 +123,7 @@ if (defined($gff)) {
     my $db;
 
     if ( @fasta ) {
-        $db = FastaDatabase->from_fasta( @fasta );
+        $db = Bio::JBrowse::FastaDatabase->from_fasta( @fasta );
 
         die "IDs not implemented for FASTA database" if defined($refids);
 
@@ -134,7 +134,7 @@ if (defined($gff)) {
         die "found no sequences in FASTA file" if ("" eq $refs);
 
     } elsif (defined($confFile)) {
-        my $config = JsonGenerator::readJSON($confFile);
+        my $config = Bio::JBrowse::JsonGenerator::readJSON($confFile);
 
         eval "require $config->{db_adaptor}; 1" or die $@;
 
@@ -240,15 +240,15 @@ if( $compress ) {
     # in the seq/ dir that will automatically configure users with
     # Apache (and AllowOverride on) to serve the .txt.gz files
     # correctly
-    require GenomeDB;
+    require Bio::JBrowse::GenomeDB;
     my $hta = catfile( $outDir, 'seq', '.htaccess' );
     open my $hta_fh, '>', $hta or die "$! writing $hta";
-    $hta_fh->print( GenomeDB->precompression_htaccess('.txtz','.jsonz') );
+    $hta_fh->print( Bio::JBrowse::GenomeDB->precompression_htaccess('.txtz','.jsonz') );
 }
 
 
 unless ($noSeq) {
-    JsonGenerator::modifyJsonFile( catfile( $outDir, "trackList.json" ),
+    Bio::JBrowse::JsonGenerator::modifyJsonFile( catfile( $outDir, "trackList.json" ),
                                   sub {
                                       my $trackList = shift;
                                       unless (defined($trackList)) {

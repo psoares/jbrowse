@@ -4,10 +4,10 @@ GenomeDB - central "handle" for a directory tree of JBrowse JSON data
 
 =head1 SYNOPSIS
 
-    my $gdb = GenomeDB->new( '/path/to/data/dir' );
+    my $gdb = Bio::JBrowse::GenomeDB->new( '/path/to/data/dir' );
 
     my $track = $gdb->getTrack($tableName, $trackConfig, $track->{shortLabel} );
-    #returns an object for the track, e.g. a FeatureTrack
+    #returns an object for the track, e.g. a Bio::JBrowse::FeatureTrack
 
     unless( defined $track ) {
         $track = $gdb->createFeatureTrack( $trackLabel,
@@ -36,7 +36,7 @@ use Storable 'dclone';
 
 use Hash::Merge ();
 
-use JsonFileStorage;
+use Bio::JBrowse::JsonFileStorage;
 
 my $defaultTracklist = {
                         formatVersion => 1,
@@ -57,7 +57,7 @@ sub new {
 
     my $self = {
                 dataDir => $dataDir,
-                rootStore => JsonFileStorage->new($dataDir, 0, {pretty => 1}),
+                rootStore => Bio::JBrowse::JsonFileStorage->new($dataDir, 0, {pretty => 1}),
                 trackDirTempl => File::Spec->join($dataDir, @trackDirHeirarchy),
                 trackUrlTempl => join("/", @trackDirHeirarchy)
                };
@@ -114,32 +114,32 @@ sub writeTrackEntry {
 
 =head2 createFeatureTrack( $label, \%config, $key, $jsclass )
 
-Create a new FeatureTrack object in this data dir with the given
+Create a new Bio::JBrowse::FeatureTrack object in this data dir with the given
 label, config, key, and (JavaScript) class.
 
-$jsclass is optional, and defaults to C<FeatureTrack>.
+$jsclass is optional, and defaults to C<Bio::JBrowse::FeatureTrack>.
 
 =cut
 
 sub createFeatureTrack {
     my $self = shift;
-    push( @_, 'FeatureTrack' ) if @_ < 4;
-    $self->_create_track( FeatureTrack => @_ );
+    push( @_, 'Bio::JBrowse::FeatureTrack' ) if @_ < 4;
+    $self->_create_track( Bio::JBrowse::FeatureTrack => @_ );
 }
 
 =head2 createImageTrack( $label, \%config, $key, $jsclass )
 
-Create a new ImageTrack object in this data dir with the given
+Create a new Bio::JBrowse::ImageTrack object in this data dir with the given
 label, config, key, and (JavaScript) class.
 
-$jsclass is optional, and defaults to C<ImageTrack>.
+$jsclass is optional, and defaults to C<Bio::JBrowse::ImageTrack>.
 
 =cut
 
 sub createImageTrack {
     my $self = shift;
-    push( @_, 'ImageTrack' ) if @_ < 4;
-    $self->_create_track( ImageTrack => @_ );
+    push( @_, 'Bio::JBrowse::ImageTrack' ) if @_ < 4;
+    $self->_create_track( Bio::JBrowse::ImageTrack => @_ );
 }
 
 sub _create_track {
@@ -152,7 +152,7 @@ sub _create_track {
 
 =head2 getTrack( $trackLabel, $config, $key, $jsclass )
 
-Get a track object (FeatureTrack or otherwise) from the GenomeDB.  If
+Get a track object (Bio::JBrowse::FeatureTrack or otherwise) from the Bio::JBrowse::GenomeDB.  If
 $config, $key, and/or $jsclass are provided, they are merged into and
 override the existing settings for that track.
 
@@ -191,9 +191,9 @@ sub getTrack {
 
     # make a list of perl packages to try, finding the most specific
     # perl track class that matches the type in the JSON file.  For
-    # example, ImageTrack.Wiggle.Frobnicated will try first to require
-    # ImageTrack::Wiggle::Frobnicated, then ImageTrack::Wiggle, then
-    # finally ImageTrack.
+    # example, Bio::JBrowse::ImageTrack.Wiggle.Frobnicated will try first to require
+    # Bio::JBrowse::ImageTrack::Wiggle::Frobnicated, then ImageTrack::Wiggle, then
+    # finally Bio::JBrowse::ImageTrack.
     my @packages_to_try = ( $type );
     while( $type =~ s/::[^:]+$// ) {
         push @packages_to_try, $type;
@@ -260,7 +260,7 @@ Return an arrayref of track definition hashrefs similar to:
           urlTemplate => "tracks/ExampleFeatures/{refseq}/trackData.json",
           key    => "Example Features",
           label  => "ExampleFeatures",
-          type   => "FeatureTrack",
+          type   => "Bio::JBrowse::FeatureTrack",
         },
         ...
     ]

@@ -6,7 +6,7 @@ use Carp;
 
 =head1 DESCRIPTION
 
-    The ArrayRepr class is for operating on indexed representations of objects.
+    The Bio::JBrowse::ArrayRepr class is for operating on indexed representations of objects.
 
     For example, if we have a lot of objects with similar attributes, e.g.:
 

@@ -21,8 +21,8 @@ Data directory to process.  Default 'data/'.
 
 =item --thresh <threshold>
 
-Optional LazyPatricia chunking threshold.  Default 200.  See
-L<LazyPatricia> for details.
+Optional Bio::JBrowse::LazyPatricia chunking threshold.  Default 200.  See
+L<Bio::JBrowse::LazyPatricia> for details.
 
 =item --verbose
 
@@ -41,7 +41,7 @@ use warnings;
 
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
-use JBlibs;
+use Bio::JBrowse::libs;
 
 use Fcntl ":flock";
 use File::Spec::Functions;
@@ -52,8 +52,8 @@ use Pod::Usage;
 use JSON 2;
 
 
-use LazyPatricia;
-use GenomeDB;
+use Bio::JBrowse::LazyPatricia;
+use Bio::JBrowse::GenomeDB;
 
 my %trackHash;
 my @tracksWithNames;
@@ -78,7 +78,7 @@ the --dir command line option.
 OUTDIR
 }
 
-my $gdb = GenomeDB->new( $outDir );
+my $gdb = Bio::JBrowse::GenomeDB->new( $outDir );
 my $nameDir = catdir($outDir, "names");
 mkdir($nameDir) unless (-d $nameDir);
 
@@ -134,11 +134,11 @@ if( my @lazyFiles = glob( catfile( $nameDir, "lazy-*" )) ) {
       or die "couldn't unlink name files: $!";
 }
 
-my $trie = LazyPatricia::create( \%nameHash );
+my $trie = Bio::JBrowse::LazyPatricia::create( \%nameHash );
 $trie->[0] = \@tracksWithNames;
 
 my ($total, $thisChunk) =
-  LazyPatricia::partition( $trie, "", $thresh, sub {
+  Bio::JBrowse::LazyPatricia::partition( $trie, "", $thresh, sub {
       my ($subtreeRoot, $prefix, $thisChunk, $total) = @_;
       # output subtree
       writeJSON( catfile($nameDir, "lazy-$prefix.json"),

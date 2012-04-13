@@ -1,18 +1,18 @@
 use strict;
 use warnings FATAL => 'all';
 
-use JBlibs;
+use Bio::JBrowse::libs;
 
 use Test::More;
 
 use lib 'lib';
-use FastaDatabase;
+use Bio::JBrowse::FastaDatabase;
 
-my $db = FastaDatabase->from_fasta( 'sample_data/raw/volvox/volvox.fa', glob 'sample_data/raw/yeast_scaffolds/chr*.fa.*' );
+my $db = Bio::JBrowse::FastaDatabase->from_fasta( 'sample_data/raw/volvox/volvox.fa', glob 'sample_data/raw/yeast_scaffolds/chr*.fa.*' );
 my $seq_ids = [ sort $db->seq_ids ];
 is_deeply( $seq_ids,
            [ sort 'chrI','chrII', 'ctgA', 'ctgB' ],
-           'got right seq ids from FastaDatabase with multiple fasta files, some compressed, some not'
+           'got right seq ids from Bio::JBrowse::FastaDatabase with multiple fasta files, some compressed, some not'
          )
   or diag explain $seq_ids;
 

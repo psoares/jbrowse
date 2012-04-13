@@ -7,7 +7,7 @@ TiledImage.pm - Perl module to provide a GD-like interface for rendering large i
 =head1 SYNOPSIS
 
       # create a new image
-      my $im = new TiledImage('-width'=>100,'-height'=>100);
+      my $im = new Bio::JBrowse::TiledImage('-width'=>100,'-height'=>100);
       $im->verbose(2);
       
       # allocate some colors
@@ -70,11 +70,11 @@ TiledImage.pm - Perl module to provide a GD-like interface for rendering large i
 
 use GD::Image;
 use Carp;
-use TiledImage::MemoryPrimStorage;
-# "use TiledImage::DBPrimStorage" commented out because it is imported lazily via an "eval" statement below
-# use TiledImage::DBPrimStorage;
+use Bio::JBrowse::TiledImage::MemoryPrimStorage;
+# "use Bio::JBrowse::TiledImage::DBPrimStorage" commented out because it is imported lazily via an "eval" statement below
+# use Bio::JBrowse::TiledImage::DBPrimStorage;
 
-# Global table of TiledImage's for cleanup
+# Global table of Bio::JBrowse::TiledImage's for cleanup
 my %tiledImageCleanup;
 
 # Private methods.
@@ -260,7 +260,7 @@ foreach my $field (qw(im width height xmin xmax ymin ymax verbose persistent pri
 # representing a call to a GD::Image object, $im, of the form $im->$subroutine (@argument_list).
 
 # $self->intercepts ($subroutine)
-# returns true if this TiledImage object intercepts the named subroutine
+# returns true if this Bio::JBrowse::TiledImage object intercepts the named subroutine
 # (i.e. it has an entry in the %intercept hash).
 sub intercepts {
     my ($self, $sub) = @_;
@@ -347,7 +347,7 @@ sub finish {
 # Destructor - TEMPORARILY (?) DISABLED due to DBI connectivity problems, destruction is now the responsibility of the caller
 #sub DESTROY {
 #    my ($self) = @_;
-#    warn "TiledImage.pm IS CLEANING UP AND DISCONNECTING FROM DATABASE in destructor...\n" if $self->verbose;
+#    warn "Bio::JBrowse::TiledImage.pm IS CLEANING UP AND DISCONNECTING FROM DATABASE in destructor...\n" if $self->verbose;
 #    $self->cleanup;
 #    $self->gdtile->disconnect if $self->gdtile;  #  just in case we didn't close the database connection using finish() 
 #}
@@ -357,9 +357,9 @@ sub finish {
 
 =head2 new
 
-    my $tiledImage = new TiledImage (%args);
+    my $tiledImage = new Bio::JBrowse::TiledImage (%args);
 
-Creates a new TiledImage object.
+Creates a new Bio::JBrowse::TiledImage object.
 
 %args is a key-value hash with the following keys:
 
@@ -375,9 +375,9 @@ Creates a new TiledImage object.
 
 =item B<link>: flag indicating whether to use filesystem links to repeat identical tiles. True by default; set to zero to disable this feature
 
-=item B<-primdb>: use a database to cache GD primitives, rather than storing them in memory (see TiledImage/gdtile.sql for SQL commands to create the database)
+=item B<-primdb>: use a database to cache GD primitives, rather than storing them in memory (see Bio::JBrowse::TiledImage/gdtile.sql for SQL commands to create the database)
 
-=item B<-tiledimage_name>: unique identifier for this TiledImage. mandatory if B<-primdb> is used
+=item B<-tiledimage_name>: unique identifier for this Bio::JBrowse::TiledImage. mandatory if B<-primdb> is used
 
 =item B<-persistent>: when used with B<-primdb>, do not delete primitives from database after rendering tiles
 
@@ -398,14 +398,14 @@ sub new {
 
     foreach my $arg (keys %args) {
       unless ($allowed_args{$arg}) {
-	croak ("You specified an invalid arg ($arg) to TiledImage constructor (you passed in: ",
+	croak ("You specified an invalid arg ($arg) to Bio::JBrowse::TiledImage constructor (you passed in: ",
 	       join (' ', map { $_ . '=>' . $args{$_} } sort keys %args), ")");
       }
     }
 
     foreach my $arg (@required_args) {
       unless (defined $args{$arg}) {
-	croak ("You did not specify a required arg ($arg) to TiledImage constructor (you passed in: ",
+	croak ("You did not specify a required arg ($arg) to Bio::JBrowse::TiledImage constructor (you passed in: ",
 	       join (' ', map { $_ . '=>' . $args{$_} } sort keys %args), ")");
       }
     }
@@ -416,15 +416,15 @@ sub new {
 
     my $primstorage;
     if ($args{'-primdb'}) {
-	eval "use TiledImage::DBPrimStorage";   # import DBPrimStorage here, rather than at top of file, so TiledImage.pm will still work even if DBI.pm is unavailable
-	$primstorage = DBPrimStorage->new(
+	eval "use Bio::JBrowse::TiledImage::DBPrimStorage";   # import Bio::JBrowse::DBPrimStorage here, rather than at top of file, so TiledImage.pm will still work even if DBI.pm is unavailable
+	$primstorage = Bio::JBrowse::DBPrimStorage->new(
             -primdb => $args{'-primdb'},
 	    -tiledimage_name => $args{'-tiledimage_name'},
 	    -width => $args{'-width'} || '',
 	    -height => $args{'-height'} || '',
 	    -verbose => $verbose);
     } else {
-	$primstorage = MemoryPrimStorage->new(
+	$primstorage = Bio::JBrowse::MemoryPrimStorage->new(
 	    -width => $args{-width}, -height => $args{-height},
 	    -tile_width_hint => $args{'-tile_width_hint'} || 1000,
 	    -verbose => $verbose);
@@ -515,7 +515,7 @@ sub renderTile {
 
     $tiledImage->cleanup();
 
-Call this after rendering all tiles, to allow the TiledImage object to perform cleanup operations (e.g. removing primitives from the database).
+Call this after rendering all tiles, to allow the Bio::JBrowse::TiledImage object to perform cleanup operations (e.g. removing primitives from the database).
 
 =cut
 
@@ -539,7 +539,7 @@ sub cleanup {
 
 =head2 Intercepted GD::Image methods
 
-The following methods of B<GD::Image> methods have analogous implementations in TiledImage:
+The following methods of B<GD::Image> methods have analogous implementations in Bio::JBrowse::TiledImage:
 
 =over 2
 
@@ -607,7 +607,7 @@ The following methods of B<GD::Image> methods have analogous implementations in 
 
 =head2 Unimplemented GD::Image methods
 
-The following GD::Image methods are B<not> implemented by TiledImage:
+The following GD::Image methods are B<not> implemented by Bio::JBrowse::TiledImage:
 
 =over
 
@@ -645,7 +645,7 @@ The following GD::Image methods are B<not> implemented by TiledImage:
 # responsibility of the instantiating script to clean up and disconnect! [AVU 2/4/06] !!!
 
 # global_cleanup
-# method to call cleanup on all existing TiledImage's
+# method to call cleanup on all existing Bio::JBrowse::TiledImage's
 #sub global_cleanup {
 #    warn "in global_cleanup";
 #    my @tiledImage = keys %tiledImageCleanup;

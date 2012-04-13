@@ -4,7 +4,7 @@ NCLSorter - efficiently convert a stream of start-position-sorted features into 
 
 =head1 SYNOPSIS
 
-    my $sorter = NCLSorter->new(
+    my $sorter = Bio::JBrowse::NCLSorter->new(
         $startIndex, $endIndex,
         sub { $track->addFeature( $_[0] ),
        );
@@ -30,7 +30,7 @@ use Carp;
 
 =head2 new( $startIndex, $endIndex, \&output )
 
-Make a new NCLSorter which will repeatedly call the &output subroutine
+Make a new Bio::JBrowse::NCLSorter which will repeatedly call the &output subroutine
 with features.  $startIndex and $endIndex are the numerical index of
 the start and end coordinate of the input feature arrayref.
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env perl -w
 
-use TiledImage;
+use Bio::JBrowse::TiledImage;
 
 # create a new image
-my $im = new TiledImage('-width'=>100,'-height'=>100);
+my $im = new Bio::JBrowse::TiledImage('-width'=>100,'-height'=>100);
 $im->verbose(2);
 
 # allocate some colors

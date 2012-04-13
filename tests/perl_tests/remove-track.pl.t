@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use lib 'tests/perl_tests/lib';
-use JBlibs;
+use Bio::JBrowse::libs;
 
 use File::Temp;
 use Test::More;
@@ -12,10 +12,10 @@ use File::Copy::Recursive 'dircopy';
 
 use FileSlurping 'slurp';
 
-use Script::RemoveTrack;
+use Bio::JBrowse::Script::RemoveTrack;
 
 sub remove_track {
-    Script::RemoveTrack->new( '--quiet',  @_ )->run
+    Bio::JBrowse::Script::RemoveTrack->new( '--quiet',  @_ )->run
 }
 
 {

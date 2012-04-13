@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use lib 'tests/perl_tests/lib';
-use JBlibs;
+use Bio::JBrowse::libs;
 
 use File::Spec::Functions 'catfile';
 use File::Temp;
@@ -47,7 +47,7 @@ is_deeply( $tracklist,
                        'urlTemplate' => 'tracks/volvox_microarray.wig/{refseq}/trackData.json',
                        'key' => 'volvox_microarray.wig',
                        'label' => 'volvox_microarray.wig',
-                       'type' => 'ImageTrack.Wiggle'
+                       'type' => 'Bio::JBrowse::ImageTrack.Wiggle'
                    },
                  ],
                },

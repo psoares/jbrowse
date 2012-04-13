@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use JBlibs;
+use Bio::JBrowse::libs;
 
 use File::Spec::Functions 'catfile';
 use File::Temp;
@@ -57,7 +57,7 @@ for my $args ( @testargs ) {
                 'urlTemplate' => 'tracks/foo/{refseq}/trackData.json',
                 'key' => 'Fooish Test Data',
                 'label' => 'foo',
-                'type' => 'ImageTrack'
+                'type' => 'Bio::JBrowse::ImageTrack'
             }
           ]
         },
