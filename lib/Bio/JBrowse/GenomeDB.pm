@@ -123,8 +123,8 @@ $jsclass is optional, and defaults to C<Bio::JBrowse::FeatureTrack>.
 
 sub createFeatureTrack {
     my $self = shift;
-    push( @_, 'Bio::JBrowse::FeatureTrack' ) if @_ < 4;
-    $self->_create_track( Bio::JBrowse::FeatureTrack => @_ );
+    push( @_, 'FeatureTrack' ) if @_ < 4;
+    $self->_create_track( 'Bio::JBrowse::FeatureTrack' => @_ );
 }
 
 =head2 createImageTrack( $label, \%config, $key, $jsclass )
@@ -138,8 +138,8 @@ $jsclass is optional, and defaults to C<Bio::JBrowse::ImageTrack>.
 
 sub createImageTrack {
     my $self = shift;
-    push( @_, 'Bio::JBrowse::ImageTrack' ) if @_ < 4;
-    $self->_create_track( Bio::JBrowse::ImageTrack => @_ );
+    push( @_, 'ImageTrack' ) if @_ < 4;
+    $self->_create_track( 'Bio::JBrowse::ImageTrack' => @_ );
 }
 
 sub _create_track {
