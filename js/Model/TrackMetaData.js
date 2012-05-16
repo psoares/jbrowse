@@ -441,11 +441,7 @@ dojo.declare( 'JBrowse.Model.TrackMetaData', null,
         // filter with the text filter, if we have it
        if( typeof textFilter != 'undefined' ) {
             var filter = this._compileTextFilter( textFilter );
-            results = dojo.filter( results, function(item) {
-                return dojo.some( this.facets, function(facetName) {
-                           return filter( this.getValue( item, facetName ) );
-                       },this);
-            },this);
+            results = dojo.filter( results, filter, this );
         }
 
         dojo.forEach( results, function(item) {
@@ -476,7 +472,7 @@ dojo.declare( 'JBrowse.Model.TrackMetaData', null,
      */
     _compileTextFilter: function( textString ) {
         if( textString === undefined )
-            return null;
+            return function() { return false; };
 
         // parse out words and quoted words, and convert each into a regexp
         var rQuotedWord = /\s*["']([^"']+)["']\s*/g;
