@@ -3,6 +3,9 @@ dojo.declare( 'JBrowse.Model.TrackMetaData', null,
  * @lends JBrowse.Model.TrackMetaData.prototype
  */
 {
+
+    _noDataValue: '(no data)',
+
     /**
      * Data store for track metadata, supporting faceted
      * (parameterized) searching.  Keeps all of the track metadata,
@@ -83,9 +86,39 @@ dojo.declare( 'JBrowse.Model.TrackMetaData', null,
      * @private
      */
     _finishLoad: function() {
-        this.facets = this.facets.sort();
+
+        // sort the facet names
+        this.facets.sort();
+
+        // calculate the average bucket size for each facet index
+        dojo.forEach( dojof.values( this.facetIndexes.byName ), function(bucket) {
+            bucket.avgBucketSize = bucket.itemCount / bucket.bucketCount;
+        });
+        // calculate the rank of the facets: make an array of
+        // facet names sorted by bucket size, descending
+        this.facetIndexes.facetRank = dojo.clone(this.facets).sort(dojo.hitch(this,function(a,b){
+            return this.facetIndexes.byName[a].avgBucketSize - this.facetIndexes.byName[b].avgBucketSize;
+        }));
+
+        // sort the facet indexes by ident, so that we can do our
+        // kind-of-efficient N-way merging when querying
+        var itemSortFunction = dojo.hitch( this, '_itemSortFunc' );
+        dojo.forEach( dojof.values( this.facetIndexes.byName ), function( facetIndex ) {
+            dojo.forEach( dojof.keys( facetIndex.byValue ), function( value ) {
+                facetIndex.byValue[value].items = facetIndex.byValue[value].items.sort( itemSortFunction );
+            });
+        },this);
+
         this.ready = true;
         this.onReady();
+    },
+
+    _itemSortFunc: function(a,b) {
+            var ai = this.getIdentity(a),
+                bi = this.getIdentity(b);
+            return ai == bi ?  0 :
+                   ai  > bi ?  1 :
+                   ai  < bi ? -1 : 0;
     },
 
     _indexItems: function( args ) {
@@ -171,25 +204,15 @@ dojo.declare( 'JBrowse.Model.TrackMetaData', null,
             }, this);
 
             // index the items that do not have data for this facet
-            var noDataValue = '(no data)';
             dojo.forEach( new_facets, function(facet) {
                 var gotSomeWithNoData = false;
                 dojo.forEach( dojof.values( this.identIndex ), function(item) {
                     if( ! gotDataForItem[facet][this.getIdentity(item)] ) {
                         gotSomeWithNoData = true;
-                        this._indexItem( facet, noDataValue, item );
+                        this._indexItem( facet, this._noDataValue, item );
                     }
                 },this);
             },this);
-
-            // calculate the rank of the facets: make an array of
-            // facet names sorted by smallest average bucket size,
-            // descending
-            this.facetIndexes.facetRank = this.facets.sort(dojo.hitch(this,function(a,b){
-                a = this.facetIndexes.byName[a];
-                b = this.facetIndexes.byName[b];
-                return b.itemCount/b.bucketCount - a.itemCount/a.bucketCount;
-            }));
         }
     },
 
@@ -239,6 +262,16 @@ dojo.declare( 'JBrowse.Model.TrackMetaData', null,
         return this._fetchCount;
     },
 
+
+    /**
+     * Get grouped counts for each facet of the distinct values
+     * possessed by tracks that matched the query that was last run.
+     * @returns {Object}
+     */
+    getFacetCounts: function() {
+        return this._fetchFacetCounts;
+    },
+
     /**
      * Get an array of the text names of the facets that are defined
      * in this track metadata.
@@ -270,8 +303,9 @@ dojo.declare( 'JBrowse.Model.TrackMetaData', null,
         if( !index ) return {};
 
         var stats = {};
-        dojo.forEach( ['itemCount','bucketCount'], function(attr) { stats[attr] = index[attr];});
-        stats.avgBucketSize = stats.itemCount / stats.bucketCount;
+        dojo.forEach( ['itemCount','bucketCount','avgBucketSize'],
+                      function(attr) { stats[attr] = index[attr]; }
+                    );
         return stats;
     },
 
@@ -324,10 +358,33 @@ dojo.declare( 'JBrowse.Model.TrackMetaData', null,
             }
         },this);
 
+        var results = this._doQuery( query );
+
+        // and finally, hand them to the finding callback
+        findCallback(results,keywordArgs);
+        this.onFetchSuccess();
+    },
+
+    /**
+     * @private
+     */
+    _doQuery: function( /**Object*/ query ) {
         var textFilter = query.text;
         delete query.text;
 
-        var results;
+        var results = []; // array of items that completely match the query
+
+        // init counts
+        var facetMatchCounts   = {};
+        var countItem = function( item ) {
+            dojo.forEach( this.facets, function( facetName ) {
+                var value = this.getValue( item, facetName, this._noDataValue );
+                var facetEntry = facetMatchCounts[ facetName ];
+                if( !facetEntry ) facetEntry = facetMatchCounts[ facetName ] = {};
+                if( !facetEntry[value] ) facetEntry[value] = 0;
+                facetEntry[value]++;
+            },this);
+        };
 
         // if we don't actually have any facets specified in the
         // query, the results are just all the items
@@ -368,17 +425,21 @@ dojo.declare( 'JBrowse.Model.TrackMetaData', null,
                               var desired_values = query[facetName] || [];
                               if( ! desired_values.length )
                                   return;
-                              results = dojo.filter(results, function(item) {
-                                                        var value = this.getValue(item,facetName);
-                                                        return dojo.some( desired_values, function(desired) {
-                                                                              return desired == value;
-                                                                          },this);
-                                                    },this);
+                              results = dojo.filter(
+                                  results,
+                                  function(item) {
+                                      var value = this.getValue(item,facetName);
+                                      return dojo.some(
+                                          desired_values,
+                                          function(desired) {
+                                              return desired == value;
+                                          },this);
+                                  },this);
                           },this);
         }
 
         // filter with the text filter, if we have it
-	if( typeof textFilter != 'undefined' ) {
+       if( typeof textFilter != 'undefined' ) {
             var filter = this._compileTextFilter( textFilter );
             results = dojo.filter( results, function(item) {
                 return dojo.some( this.facets, function(facetName) {
@@ -387,11 +448,13 @@ dojo.declare( 'JBrowse.Model.TrackMetaData', null,
             },this);
         }
 
+        dojo.forEach( results, function(item) {
+            countItem.call( this, item );
+        },this);
+        this._fetchFacetCounts = facetMatchCounts;
         this._fetchCount = results.length;
 
-        // and finally, hand them to the finding callback
-        findCallback(results,keywordArgs);
-        this.onFetchSuccess();
+        return results;
     },
 
     /**
@@ -412,6 +475,8 @@ dojo.declare( 'JBrowse.Model.TrackMetaData', null,
      * @private
      */
     _compileTextFilter: function( textString ) {
+        if( textString === undefined )
+            return null;
 
         // parse out words and quoted words, and convert each into a regexp
         var rQuotedWord = /\s*["']([^"']+)["']\s*/g;
@@ -437,11 +502,14 @@ dojo.declare( 'JBrowse.Model.TrackMetaData', null,
             wordREs.push( new RegExp(currentWord,'i') );
         }
 
-        // return a function that returns true if all of the words
-        // match the string, but in any order
-        return function( text ) {
-            return dojof.every( wordREs, function(re) { return re.test(text); } );
-        };
+        // return a function that takes on item and returns true if it
+        // matches the text filter
+        return dojo.hitch(this, function(item) {
+            return dojo.some( this.facets, function(facetName) {
+                       var text = this.getValue( item, facetName );
+                       return dojof.every( wordREs, function(re) { return re.test(text); } );
+            },this);
+        });
     },
 
     getFeatures: function() {
